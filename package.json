@@ -1,5 +1,7 @@
 {
   "name": "@codecrafters/redis",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {
+    "respjs": "^4.2.0"
+  }
 }
