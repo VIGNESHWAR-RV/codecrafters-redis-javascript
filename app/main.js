@@ -12,7 +12,7 @@ const server = net.createServer((connection) => {
   connection.on('data', (data)=> {
     // console.log(`Data received - ${data}`);
     const req = RespParser.decode(data);
-    switch (req[0]) {
+    switch (req[0].toUpperCase()) {
       case 'PING': {
         const res = RespParser.encodeString('PONG').toString();
         connection.write(res); 
@@ -25,15 +25,28 @@ const server = net.createServer((connection) => {
         break;
       }
       case 'SET': {
-        const [type, key, value] = req;
-        redisLookup[key] = value;
+        let [type, key, value, expiryType, expiryValue] = req;
+        const val = {value};
+        if (expiryType) {
+            if (expiryType.toUpperCase() === 'EX') {
+                expiryValue = (+expiryValue) * 1000;
+            }
+            val.expiryTimeStamp = Date.now() + (+expiryValue);
+        }
+        redisLookup[key] = val;
         const res = RespParser.encodeString('OK').toString();
         connection.write(res);
         break;
       }
       case 'GET': {
         const [type, key] = req;
-        const value = redisLookup[key];
+        let {value, expiryTimeStamp} = redisLookup[key];
+        if (expiryTimeStamp && Date.now() >= expiryTimeStamp) {
+            delete redisLookup[key];
+            const res = RespParser.encodeNull().toString();
+            connection.write(res);
+            break;
+        }
         const res = RespParser.encodeBulk(value).toString();
         connection.write(res);
         break;
