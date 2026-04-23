@@ -1,5 +1,5 @@
-const { encodeToRespString } = require("../lib/respParser");
-const { redisLookup } = require("../lib/inMemoryLookup");
+const { encodeToRespString } = require("../respParser");
+const { redisLookup } = require("../inMemoryLookup");
 
 function setCommand(key, value, expiryType, expiryValue) {
   const val = { value };
