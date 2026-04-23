@@ -1,9 +1,13 @@
-const RespParser = require('respjs');
-
+const RespParser = require("respjs");
 
 function decodeResp(data) {
   const parsedData = RespParser.decode(data);
   return parsedData;
+}
+
+function encodeToRespInteger(val) {
+  const res = RespParser.encodeInteger(val).toString();
+  return res;
 }
 
 function encodeToRespString(data) {
@@ -11,7 +15,7 @@ function encodeToRespString(data) {
   return res;
 }
 
-function encodeToRespNull(){
+function encodeToRespNull() {
   const res = RespParser.encodeNull().toString();
   return res;
 }
@@ -21,9 +25,17 @@ function encodeToRespBulkString(data) {
   return res;
 }
 
-module.exports = {
-    decodeResp,
-    encodeToRespString,
-    encodeToRespNull,
-    encodeToRespBulkString
+function encodeToRespError(err) {
+  let error = err ? err : new Error("unknown error");
+  const res = RespParser.encodeError(error).toString();
+  return res;
 }
+
+module.exports = {
+  decodeResp,
+  encodeToRespInteger,
+  encodeToRespString,
+  encodeToRespNull,
+  encodeToRespBulkString,
+  encodeToRespError,
+};

@@ -9,7 +9,7 @@ function getCommand(key) {
     return res;
   }
   const res = encodeToRespBulkString(value);
-  return;
+  return res;
 }
 
 module.exports = {

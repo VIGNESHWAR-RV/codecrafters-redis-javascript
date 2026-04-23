@@ -1,4 +1,4 @@
-const { AsyncLocalStorage } = require("node:async_context");
+const { AsyncLocalStorage } = require("node:async_hooks");
 const { format } = require("node:util");
 
 class ContextualLogger {
@@ -7,7 +7,6 @@ class ContextualLogger {
     this.buffer = [];
     this.isFlushing = false;
   }
-
 
   log(level, message, ...args) {
     const context = this.als.getStore() || {};
@@ -56,7 +55,6 @@ class ContextualLogger {
 const loggerInstance = new ContextualLogger();
 
 const logger = {
-
   initSubContext: (data = {}, callback) => {
     const parentStore = loggerInstance.als.getStore();
     const newStore = parentStore ? { ...parentStore, ...data } : { ...data };
