@@ -1,4 +1,5 @@
 const net = require("net");
+const { randomUUID } = require("node:crypto");
 const { AVAILABLE_COMMANDS } = require("./lib/commands");
 const { logger } = require("./lib/contextualLogger");
 const { decodeResp, encodeToRespError } = require("./lib/respParser");
@@ -7,6 +8,7 @@ const { decodeResp, encodeToRespError } = require("./lib/respParser");
 logger.info("Logs from your program will appear here!");
 
 function executeAvailableCommand(reqData) {
+  const startTime = Date.now();
   try {
     const [reqType, ...reqDetails] = decodeResp(reqData);
     logger.info(reqType);
@@ -15,23 +17,23 @@ function executeAvailableCommand(reqData) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
     const res = commandToBeExecuted(...reqDetails);
-    return res;
+    return res.toString();
   } catch (err) {
     logger.error(err.stack);
     const res = encodeToRespError(err);
-    return res;
+    return res.toString();
+  } finally {
+    logger.info(`Time Taken for execution - ${Date.now() - startTime}`);
   }
 }
 
 // Uncomment the code below to pass the first stage
 const server = net.createServer((connection) => {
-  logger.initSubContext({ serverStartTime: Date.now() }, () => {
-    // Handle connection
-    connection.on("data", (data) => {
-      logger.initSubContext({}, () => {
-        const res = executeAvailableCommand(data);
-        connection.write(res);
-      });
+  // Handle connection
+  connection.on("data", (data) => {
+    logger.initSubContext({ traceId: randomUUID() }, () => {
+      const res = executeAvailableCommand(data);
+      connection.write(res);
     });
   });
 });

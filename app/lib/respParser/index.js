@@ -6,28 +6,33 @@ function decodeResp(data) {
 }
 
 function encodeToRespInteger(val) {
-  const res = RespParser.encodeInteger(val).toString();
+  const res = RespParser.encodeInteger(val);
   return res;
 }
 
 function encodeToRespString(data) {
-  const res = RespParser.encodeString(data).toString();
+  const res = RespParser.encodeString(data);
   return res;
 }
 
 function encodeToRespNull() {
-  const res = RespParser.encodeNull().toString();
+  const res = RespParser.encodeNull();
   return res;
 }
 
 function encodeToRespBulkString(data) {
-  const res = RespParser.encodeBulk(data).toString();
+  const res = RespParser.encodeBulk(data);
+  return res;
+}
+
+function encodeToRespArray(arr = []) {
+  const res = RespParser.encodeArray(arr);
   return res;
 }
 
 function encodeToRespError(err) {
   let error = err ? err : new Error("unknown error");
-  const res = RespParser.encodeError(error).toString();
+  const res = RespParser.encodeError(error);
   return res;
 }
 
@@ -37,5 +42,6 @@ module.exports = {
   encodeToRespString,
   encodeToRespNull,
   encodeToRespBulkString,
+  encodeToRespArray,
   encodeToRespError,
 };
