@@ -57,7 +57,7 @@ async function blPopCommand(listName, timer = 0) {
         logger.info("triggering callback");
         res([listName, removedValue]);
       };
-      observersList.push(callback);
+      observersList.push(callback.bind(this));
       if (timer) {
         logger.info(`setting timer - ${timer}`);
         setTimeout(() => {
