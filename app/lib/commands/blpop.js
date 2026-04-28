@@ -55,6 +55,7 @@ async function blPopCommand(listName, timer = 0) {
     }
     result = await new Promise((res, rej) => {
       const callback = (removedValue) => {
+        logger.info("triggering callback");
         res([listName, removedValue]);
       };
       observersList.push(callback);
@@ -68,6 +69,7 @@ async function blPopCommand(listName, timer = 0) {
         }, timer * 1000);
       }
     });
+    logger.info(`result - ${result}`);
   } else {
     const removedValue = list.shift();
     result = [listName, removedValue];
