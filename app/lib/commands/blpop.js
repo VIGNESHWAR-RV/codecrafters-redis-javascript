@@ -25,7 +25,7 @@ function createObservableArray() {
           callbacks.forEach((cb) => cb(removedValue));
           observersLookup.delete(observed);
           isManualMutation = false;
-        }, 0);
+        }, 1000);
       }
 
       return true;
