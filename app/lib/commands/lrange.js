@@ -11,17 +11,28 @@ function lRangeCommand(listName, startIndex, endIndex) {
   startIndex = +startIndex;
   endIndex = +endIndex;
 
-  if (startIndex > endIndex) {
-    return encodeToRespArray();
-  }
-
   const list = redisLookup[listName];
 
   if (!list) {
     return encodeToRespArray();
   }
 
-  if (startIndex > list.length - 1) {
+  if (startIndex < 0) {
+    startIndex = list.length + startIndex;
+    if (startIndex < 0) {
+      startIndex = 0;
+    }
+  }
+
+  if (endIndex < 0) {
+    endIndex = list.length + endIndex;
+  }
+
+  if (startIndex > endIndex) {
+    return encodeToRespArray();
+  }
+
+  if (startIndex >= list.length) {
     return encodeToRespArray();
   }
 
