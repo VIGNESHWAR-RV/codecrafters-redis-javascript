@@ -60,6 +60,7 @@ async function blPopCommand(listName, timer = 0) {
       };
       observersList.push(callback);
       if (timer) {
+        logger.info(`setting timer - ${timer}`);
         setTimeout(() => {
           observersLookup.set(
             list,
