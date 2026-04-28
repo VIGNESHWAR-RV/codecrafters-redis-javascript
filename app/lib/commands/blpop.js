@@ -52,8 +52,8 @@ async function blPopCommand(listName, timer = 0) {
       observersList = [];
       observersLookup.set(list, observersList);
     }
-    result = await new Promise(function (res, rej) {
-      const callback = (removedValue) => {
+    result = await new Promise((res, rej) => {
+      const callback = function (removedValue) {
         logger.info("triggering callback");
         res([listName, removedValue]);
       };
