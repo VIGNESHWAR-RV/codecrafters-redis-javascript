@@ -14,7 +14,7 @@ function createObservableArray() {
   const observed = new Proxy([], {
     set(target, prop, value) {
       target[prop] = value;
-      if (!isManualMutation && observersLookup[observed]) {
+      if (!isManualMutation && observersLookup.get(observed)) {
         // Clear and reset a timer so the logic runs only ONCE after the last set
         clearTimeout(timeout);
         timeout = setTimeout(() => {
