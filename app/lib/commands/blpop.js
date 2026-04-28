@@ -14,19 +14,16 @@ function createObservableArray() {
   const observed = new Proxy([], {
     set(target, prop, value) {
       target[prop] = value;
-      logger.info("mutation triggered");
-      if (!isManualMutation) {
+      if (!isManualMutation && observersLookup[observed]) {
         // Clear and reset a timer so the logic runs only ONCE after the last set
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-          if (observersLookup[target]) {
-            isManualMutation = true;
-            const removedValue = target.shift();
-            const callbacks = observersLookup[target];
-            callbacks.forEach((cb) => cb(removedValue));
-            observersLookup.delete(target);
-            isManualMutation = false;
-          }
+          isManualMutation = true;
+          const removedValue = observed.shift();
+          const callbacks = observersLookup[observed];
+          callbacks.forEach((cb) => cb(removedValue));
+          observersLookup.delete(observed);
+          isManualMutation = false;
         }, 0);
       }
 
