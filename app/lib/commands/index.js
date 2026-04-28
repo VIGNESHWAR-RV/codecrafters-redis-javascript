@@ -5,6 +5,7 @@ const { pingCommand } = require("./ping");
 const { rPushCommand } = require("./rpush");
 const { lRangeCommand } = require("./lrange");
 const { lPushCommand } = require("./lpush");
+const { lLenCommand } = require("./llen");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -13,7 +14,8 @@ const AVAILABLE_COMMANDS = {
   SET: setCommand,
   RPUSH: rPushCommand,
   LRANGE: lRangeCommand,
-  LPUSH: lPushCommand
+  LPUSH: lPushCommand,
+  LLEN: lLenCommand,
 };
 
 module.exports = {
