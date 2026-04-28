@@ -19,12 +19,10 @@ function createObservableArray() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           isManualMutation = true;
+          const removedValue = observed.shift();
           const callbacks = observersLookup.get(observed);
           logger.info(`calling mutation observers - ${callbacks.length}`);
-          callbacks.forEach((cb) => {
-            const removedValue = observed.shift();
-            cb(removedValue);
-          });
+          callbacks.forEach((cb) => cb(removedValue));
           observersLookup.delete(observed);
           isManualMutation = false;
         }, 0);
@@ -57,13 +55,9 @@ async function blPopCommand(listName, timer = 0) {
     result = await new Promise((res, rej) => {
       const callback = (removedValue) => {
         logger.info("triggering callback");
-        if (removedValue) {
-          res([listName, removedValue]);
-        } else {
-          res([]);
-        }
+        res([listName, removedValue]);
       };
-      observersList.unshift(callback);
+      observersList.push(callback);
       if (timer) {
         logger.info(`setting timer - ${timer}`);
         setTimeout(() => {
