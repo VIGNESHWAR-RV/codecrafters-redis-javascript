@@ -14,7 +14,7 @@ function createObservableArray() {
   const observed = new Proxy([], {
     set(target, prop, value) {
       target[prop] = value;
-
+      logger.info("mutation triggered");
       if (!isManualMutation) {
         // Clear and reset a timer so the logic runs only ONCE after the last set
         clearTimeout(timeout);
