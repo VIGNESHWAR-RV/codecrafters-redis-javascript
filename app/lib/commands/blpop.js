@@ -38,6 +38,7 @@ function createObservableArray() {
 }
 
 async function blPopCommand(listName, timer = 0) {
+  timer = +timer;
   let list = redisLookup[listName];
 
   if (!list) {
