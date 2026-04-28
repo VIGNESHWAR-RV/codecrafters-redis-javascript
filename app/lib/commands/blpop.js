@@ -19,13 +19,19 @@ function createObservableArray() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           isManualMutation = true;
-          const removedValue = observed.shift();
           const callbacks = observersLookup.get(observed);
           logger.info(`calling mutation observers - ${callbacks.length}`);
-          callbacks.forEach((cb) => cb(removedValue));
+          callbacks.forEach((cb) => {
+            const removedValue = observed.shift();
+            if (removedValue) {
+              cb(removedValue);
+            } else {
+              cb();
+            }
+          });
           observersLookup.delete(observed);
           isManualMutation = false;
-        }, 1000);
+        }, 0);
       }
 
       return true;
