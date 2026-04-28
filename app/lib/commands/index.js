@@ -7,6 +7,7 @@ const { lRangeCommand } = require("./lrange");
 const { lPushCommand } = require("./lpush");
 const { lLenCommand } = require("./llen");
 const { lPopCommand } = require("./lpop");
+const { blPopCommand } = require("./blpop");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -20,6 +21,7 @@ const AVAILABLE_COMMANDS = {
   LPUSH: lPushCommand,
   LLEN: lLenCommand,
   LPOP: lPopCommand,
+  BLPOP: blPopCommand,
 };
 
 module.exports = {

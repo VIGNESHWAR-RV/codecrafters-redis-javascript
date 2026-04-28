@@ -7,7 +7,7 @@ const { decodeResp, encodeToRespError } = require("./lib/respParser");
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 logger.info("Logs from your program will appear here!");
 
-function executeAvailableCommand(reqData) {
+async function executeAvailableCommand(reqData) {
   const startTime = Date.now();
   try {
     const [reqType, ...reqDetails] = decodeResp(reqData);
@@ -16,7 +16,7 @@ function executeAvailableCommand(reqData) {
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
-    const res = commandToBeExecuted(...reqDetails);
+    const res = await commandToBeExecuted(...reqDetails);
     return res.toString();
   } catch (err) {
     logger.error(err.stack);
@@ -31,8 +31,8 @@ function executeAvailableCommand(reqData) {
 const server = net.createServer((connection) => {
   // Handle connection
   connection.on("data", (data) => {
-    logger.initSubContext({ traceId: randomUUID() }, () => {
-      const res = executeAvailableCommand(data);
+    logger.initSubContext({ traceId: randomUUID() }, async () => {
+      const res = await executeAvailableCommand(data);
       connection.write(res);
     });
   });
