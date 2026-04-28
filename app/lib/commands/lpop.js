@@ -21,7 +21,7 @@ function lPopCommand(listName, elementsCount = 1) {
 
   for (let i = 0; i < elementsCount; i++) {
     const removedValue = list.shift();
-    removedValues.push(removedValue);
+    removedValues.push(encodeToRespBulkString(removedValue));
   }
 
   if (!removedValues.length) {
@@ -29,8 +29,7 @@ function lPopCommand(listName, elementsCount = 1) {
   }
 
   if (removedValues.length === 1) {
-    const res = encodeToRespBulkString(removedValues[0]);
-    return res;
+    return removedValues[0];
   }
 
   const res = encodeToRespArray(removedValues);
