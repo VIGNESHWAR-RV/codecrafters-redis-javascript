@@ -9,23 +9,25 @@ const {
 const observersLookup = new Map();
 
 function notifyBlPopObservers(list) {
-  if (list.length) {
-    const callbacks = observersLookup.get(list);
-    if (callbacks.length) {
-      const removedValue = list.shift();
-      logger.debug(`calling longest waiting mutation observer`);
-      const callback = callbacks.shift();
-      callback(removedValue);
-      if (!callbacks.length) {
+  setImmediate(() => {
+    if (list.length) {
+      const callbacks = observersLookup.get(list);
+      if (callbacks.length) {
+        const removedValue = list.shift();
+        logger.debug(`calling longest waiting mutation observer`);
+        const callback = callbacks.shift();
+        callback(removedValue);
+        if (!callbacks.length) {
+          observersLookup.delete(list);
+        }
+        if (list.length) {
+          notifyObservers(list);
+        }
+      } else {
         observersLookup.delete(list);
       }
-      if (list.length) {
-        notifyObservers(list);
-      }
-    } else {
-      observersLookup.delete(list);
     }
-  }
+  });
 }
 
 async function blPopCommand(listName, timer = 0) {
