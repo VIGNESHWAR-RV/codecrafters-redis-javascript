@@ -1,10 +1,10 @@
-const { logger } = require("../contextualLogger");
-const { redisLookup } = require("../inMemoryLookup/index");
+const { logger } = require("../../contextualLogger");
+const { redisLookup } = require("../../inMemoryLookup");
 const {
   encodeToRespBulkString,
   encodeToRespArray,
   encodeToRespNullArray,
-} = require("../respParser/index");
+} = require("../../respParser");
 
 const observersLookup = new Map();
 

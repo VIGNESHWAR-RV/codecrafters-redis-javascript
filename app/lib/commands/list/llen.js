@@ -1,5 +1,5 @@
-const { redisLookup } = require("../inMemoryLookup/index");
-const { encodeToRespInteger } = require("../respParser/index");
+const { redisLookup } = require("../../inMemoryLookup");
+const { encodeToRespInteger } = require("../../respParser");
 
 function lLenCommand(listName, ...values) {
   let list = redisLookup[listName];

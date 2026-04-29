@@ -1,9 +1,9 @@
-const { logger } = require("../contextualLogger");
-const { redisLookup } = require("../inMemoryLookup/index");
+const { logger } = require("../../contextualLogger");
+const { redisLookup } = require("../../inMemoryLookup");
 const {
   encodeToRespBulkString,
   encodeToRespArray,
-} = require("../respParser/index");
+} = require("../../respParser");
 
 function lPopCommand(listName, elementsCount = 1) {
   elementsCount = +elementsCount;

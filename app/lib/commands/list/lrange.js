@@ -1,9 +1,9 @@
-const { logger } = require("../contextualLogger");
-const { redisLookup } = require("../inMemoryLookup/index");
+const { logger } = require("../../contextualLogger");
+const { redisLookup } = require("../../inMemoryLookup");
 const {
   encodeToRespArray,
   encodeToRespBulkString,
-} = require("../respParser/index");
+} = require("../../respParser");
 
 function lRangeCommand(listName, startIndex, endIndex) {
   logger.info(startIndex, endIndex);

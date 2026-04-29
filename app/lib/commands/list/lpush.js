@@ -1,5 +1,5 @@
-const { redisLookup } = require("../inMemoryLookup");
-const { encodeToRespInteger } = require("../respParser");
+const { redisLookup } = require("../../inMemoryLookup");
+const { encodeToRespInteger } = require("../../respParser");
 const { notifyBlPopObservers } = require("./blpop");
 
 function lPushCommand(listName, ...values) {

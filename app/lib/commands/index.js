@@ -1,13 +1,14 @@
-const { getCommand } = require("./get");
-const { setCommand } = require("./set");
-const { echoCommand } = require("./echo");
-const { pingCommand } = require("./ping");
-const { rPushCommand } = require("./rpush");
-const { lRangeCommand } = require("./lrange");
-const { lPushCommand } = require("./lpush");
-const { lLenCommand } = require("./llen");
-const { lPopCommand } = require("./lpop");
-const { blPopCommand } = require("./blpop");
+const { getCommand } = require("./basic/get");
+const { setCommand } = require("./basic/set");
+const { echoCommand } = require("./basic/echo");
+const { pingCommand } = require("./basic/ping");
+
+const { rPushCommand } = require("./list/rpush");
+const { lRangeCommand } = require("./list/lrange");
+const { lPushCommand } = require("./list/lpush");
+const { lLenCommand } = require("./list/llen");
+const { lPopCommand } = require("./list/lpop");
+const { blPopCommand } = require("./list/blpop");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
