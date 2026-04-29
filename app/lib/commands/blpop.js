@@ -22,7 +22,7 @@ function createObservableArray() {
           const removedValue = observed.shift();
           const callbacks = observersLookup.get(observed);
           logger.info(`calling mutation observers - ${callbacks.length}`);
-          callbacks.forEach((cb) => cb(removedValue));
+          callbacks[0](removedValue);
           observersLookup.delete(observed);
           isManualMutation = false;
         }, 0);
