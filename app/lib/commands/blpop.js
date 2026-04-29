@@ -12,7 +12,7 @@ function notifyBlPopObservers(list) {
   setImmediate(() => {
     if (list.length) {
       const callbacks = observersLookup.get(list);
-      if (callbacks.length) {
+      if (callbacks?.length) {
         const removedValue = list.shift();
         logger.debug(`calling longest waiting mutation observer`);
         const callback = callbacks.shift();
