@@ -1,4 +1,4 @@
-const { encodeToRespString } = require("../respParser");
+const { encodeToRespString } = require("../../respParser");
 
 function pingCommand() {
   const res = encodeToRespString("PONG");

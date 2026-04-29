@@ -1,5 +1,5 @@
-const { encodeToRespNull, encodeToRespBulkString } = require("../respParser");
-const { redisLookup } = require("../inMemoryLookup");
+const { encodeToRespNull, encodeToRespBulkString } = require("../../respParser");
+const { redisLookup } = require("../../inMemoryLookup");
 
 function getCommand(key) {
   let { value, expiryTimeStamp } = redisLookup[key];
