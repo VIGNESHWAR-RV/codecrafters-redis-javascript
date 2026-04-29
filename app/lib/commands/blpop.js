@@ -3,6 +3,7 @@ const { redisLookup } = require("../inMemoryLookup/index");
 const {
   encodeToRespBulkString,
   encodeToRespArray,
+  encodeToRespNullArray,
 } = require("../respParser/index");
 
 const observersLookup = new Map();
@@ -36,47 +37,53 @@ function createObservableArray() {
 }
 
 async function blPopCommand(listName, timer = 0) {
-  timer = +timer;
-  let list = redisLookup[listName];
+  try {
+    timer = +timer;
+    let list = redisLookup[listName];
 
-  if (!list) {
-    list = createObservableArray();
-    redisLookup[listName] = list;
-  }
-
-  let result;
-
-  if (!list[0]) {
-    let observersList = observersLookup.get(list);
-    if (!observersList) {
-      observersList = [];
-      observersLookup.set(list, observersList);
+    if (!list) {
+      list = createObservableArray();
+      redisLookup[listName] = list;
     }
-    result = await new Promise((res, rej) => {
-      const callback = (removedValue) => {
-        logger.info("triggering callback");
-        res([listName, removedValue]);
-      };
-      observersList.push(callback);
-      if (timer) {
-        logger.info(`setting timer - ${timer}`);
-        setTimeout(() => {
-          observersLookup.set(
-            list,
-            observersList.filter((cb) => cb !== callback),
-          );
-          res([]);
-        }, timer * 1000);
-      }
-    });
-    logger.info(`result - ${result}`);
-  } else {
-    const removedValue = list.shift();
-    result = [listName, removedValue];
-  }
 
-  const res = encodeToRespArray(result.map(encodeToRespBulkString));
-  return res;
+    let result;
+
+    if (!list[0]) {
+      let observersList = observersLookup.get(list);
+      if (!observersList) {
+        observersList = [];
+        observersLookup.set(list, observersList);
+      }
+      result = await new Promise((res, rej) => {
+        const callback = (removedValue) => {
+          logger.info("triggering callback");
+          res([listName, removedValue]);
+        };
+        observersList.push(callback);
+        if (timer) {
+          logger.info(`setting timer - ${timer}`);
+          setTimeout(() => {
+            observersLookup.set(
+              list,
+              observersList.filter((cb) => cb !== callback),
+            );
+            rej(`client given wait time is over - ${timer} seconds`);
+          }, timer * 1000);
+        }
+      });
+      logger.info(`result - ${result}`);
+    } else {
+      const removedValue = list.shift();
+      result = [listName, removedValue];
+    }
+
+    const res = encodeToRespArray(result.map(encodeToRespBulkString));
+    return res;
+  } catch (err) {
+    logger.error(err.stack);
+    const res = encodeToRespNullArray();
+    return res;
+  }
 }
 
 module.exports = {

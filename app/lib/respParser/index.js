@@ -30,6 +30,11 @@ function encodeToRespArray(arr = []) {
   return res;
 }
 
+function encodeToRespNullArray() {
+  const res = RespParser.encodeNullArray();
+  return res;
+}
+
 function encodeToRespError(err) {
   let error = err ? err : new Error("unknown error");
   const res = RespParser.encodeError(error);
@@ -43,5 +48,6 @@ module.exports = {
   encodeToRespNull,
   encodeToRespBulkString,
   encodeToRespArray,
+  encodeToRespNullArray,
   encodeToRespError,
 };
