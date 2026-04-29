@@ -80,7 +80,7 @@ async function blPopCommand(listName, timer = 0) {
     const res = encodeToRespArray(result.map(encodeToRespBulkString));
     return res;
   } catch (err) {
-    logger.error(err.stack);
+    logger.error(err.message);
     const res = encodeToRespNullArray();
     return res;
   }

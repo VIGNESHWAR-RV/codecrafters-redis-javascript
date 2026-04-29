@@ -19,7 +19,7 @@ async function executeAvailableCommand(reqData) {
     const res = await commandToBeExecuted(...reqDetails);
     return res.toString();
   } catch (err) {
-    logger.error(err.stack);
+    logger.error(err.message);
     const res = encodeToRespError(err);
     return res.toString();
   } finally {
