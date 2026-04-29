@@ -1,5 +1,6 @@
 const { redisLookup } = require("../inMemoryLookup/index");
 const { encodeToRespInteger } = require("../respParser/index");
+const { notifyBlPopObservers } = require("./blpop");
 
 function rPushCommand(listName, ...values) {
   let list = redisLookup[listName];
@@ -9,6 +10,7 @@ function rPushCommand(listName, ...values) {
   }
 
   list.push(...values);
+  notifyBlPopObservers(list);
   const res = encodeToRespInteger(list.length);
   return res;
 }

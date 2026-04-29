@@ -9,7 +9,7 @@ class ContextualLogger {
     this.BATCH_SIZE = 20; // Only stringify 20 logs before yielding to the event loop
   }
 
-  log(level, message, ...args) {
+  log(level, ...messages) {
     const store = this.als.getStore();
 
     const contextSnapshot = store ? { ...store } : {};
@@ -18,7 +18,7 @@ class ContextualLogger {
       level,
       time: new Date().toISOString(),
       context: contextSnapshot,
-      msg: format(message, ...args),
+      msg: messages,
     });
 
     if (!this.isFlushing) {
@@ -34,11 +34,12 @@ class ContextualLogger {
     }
 
     // Processing only a small chunk of logs to prevent CPU blocking
-    const chunk = this.buffer.splice(0, this.BATCH_SIZE);
+    const chunks = this.buffer.splice(0, this.BATCH_SIZE);
 
     let output = "";
-    for (let i = 0; i < chunk.length; i++) {
-      output += JSON.stringify(chunk[i]) + "\n";
+    for (let i = 0; i < chunks.length; i++) {
+      chunks[i].msg = format(chunks[i].msg);
+      output += JSON.stringify(chunks[i]) + "\n";
     }
 
     process.stdout.write(output, () => {
@@ -63,10 +64,10 @@ const logger = {
     const store = loggerInstance.als.getStore();
     if (store) store[key] = value;
   },
-  info: (msg, ...args) => loggerInstance.log("INFO", msg, ...args),
-  debug: (msg, ...args) => loggerInstance.log("DEBUG", msg, ...args),
-  warn: (msg, ...args) => loggerInstance.log("WARN", msg, ...args),
-  error: (msg, ...args) => loggerInstance.log("ERROR", msg, ...args),
+  info: (...msg) => loggerInstance.log("INFO", ...msg),
+  debug: (...msg) => loggerInstance.log("DEBUG", ...msg),
+  warn: (...msg) => loggerInstance.log("WARN", ...msg),
+  error: (...msg) => loggerInstance.log("ERROR", ...msg),
 };
 
 module.exports = { logger };

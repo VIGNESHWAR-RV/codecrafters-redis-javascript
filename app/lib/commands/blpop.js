@@ -8,32 +8,24 @@ const {
 
 const observersLookup = new Map();
 
-function createObservableArray() {
-  let timeout;
-  let isManualMutation = false;
-
-  const observed = new Proxy([], {
-    set(target, prop, value) {
-      target[prop] = value;
-      if (!isManualMutation && observersLookup.get(observed)) {
-        // Clear and reset a timer so the logic runs only ONCE after the last set
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          isManualMutation = true;
-          const removedValue = observed.shift();
-          const callbacks = observersLookup.get(observed);
-          logger.info(`calling mutation observers - ${callbacks.length}`);
-          callbacks[0](removedValue);
-          observersLookup.delete(observed);
-          isManualMutation = false;
-        }, 0);
+function notifyBlPopObservers(list) {
+  if (list.length) {
+    const callbacks = observersLookup.get(list);
+    if (callbacks.length) {
+      const removedValue = list.shift();
+      logger.debug(`calling longest waiting mutation observer`);
+      const callback = callbacks.shift();
+      callback(removedValue);
+      if (!callbacks.length) {
+        observersLookup.delete(list);
       }
-
-      return true;
-    },
-  });
-
-  return observed;
+      if (list.length) {
+        notifyObservers(list);
+      }
+    } else {
+      observersLookup.delete(list);
+    }
+  }
 }
 
 async function blPopCommand(listName, timer = 0) {
@@ -42,7 +34,7 @@ async function blPopCommand(listName, timer = 0) {
     let list = redisLookup[listName];
 
     if (!list) {
-      list = createObservableArray();
+      list = [];
       redisLookup[listName] = list;
     }
 
@@ -55,19 +47,22 @@ async function blPopCommand(listName, timer = 0) {
         observersLookup.set(list, observersList);
       }
       result = await new Promise((res, rej) => {
+        let timerId;
+
         const callback = (removedValue) => {
-          logger.info("triggering callback");
           res([listName, removedValue]);
+          if (timerId) {
+            clearTimeout(timerId);
+          }
         };
         observersList.push(callback);
+
         if (timer) {
           logger.info(`setting timer - ${timer}`);
-          setTimeout(() => {
-            observersLookup.set(
-              list,
-              observersList.filter((cb) => cb !== callback),
-            );
-            rej(`client given wait time is over - ${timer} seconds`);
+          timerId = setTimeout(() => {
+            const index = observersList.indexOf(callback);
+            if (index > -1) observersList.splice(index, 1);
+            rej(new Error(`client given wait time is over - ${timer} seconds`));
           }, timer * 1000);
         }
       });
@@ -80,7 +75,7 @@ async function blPopCommand(listName, timer = 0) {
     const res = encodeToRespArray(result.map(encodeToRespBulkString));
     return res;
   } catch (err) {
-    logger.error(err.message);
+    logger.error(err.stack);
     const res = encodeToRespNullArray();
     return res;
   }
@@ -88,4 +83,5 @@ async function blPopCommand(listName, timer = 0) {
 
 module.exports = {
   blPopCommand,
+  notifyBlPopObservers,
 };
