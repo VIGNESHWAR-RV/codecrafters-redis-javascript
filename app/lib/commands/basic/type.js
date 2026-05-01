@@ -1,9 +1,10 @@
 const { encodeToRespString } = require("../../respParser");
 const { redisLookup } = require("../../inMemoryLookup");
+const { logger } = require("../../contextualLogger");
 
 function typeCommand(key) {
   const val = redisLookup[key];
-
+  logger.info(val);
   let res;
   switch (typeof val) {
     case "string":
