@@ -5,6 +5,7 @@ const { logger } = require("../../contextualLogger");
 function typeCommand(key) {
   const val = redisLookup[key];
   logger.info(typeof val);
+  console.log(val);
   let res;
   switch (typeof val) {
     case "string":
