@@ -3,11 +3,9 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { logger } = require("../../contextualLogger");
 
 function typeCommand(key) {
-  const val = redisLookup[key];
-  logger.info(typeof val);
-  console.log(val);
+  const { value } = redisLookup[key];
   let res;
-  switch (typeof val) {
+  switch (typeof value) {
     case "string":
       res = "string";
       break;
