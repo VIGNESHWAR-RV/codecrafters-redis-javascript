@@ -2,6 +2,7 @@ const { getCommand } = require("./basic/get");
 const { setCommand } = require("./basic/set");
 const { echoCommand } = require("./basic/echo");
 const { pingCommand } = require("./basic/ping");
+const { typeCommand } = require("./basic/type");
 
 const { rPushCommand } = require("./list/rpush");
 const { lRangeCommand } = require("./list/lrange");
@@ -16,6 +17,7 @@ const AVAILABLE_COMMANDS = {
 
   GET: getCommand,
   SET: setCommand,
+  TYPE: typeCommand,
 
   RPUSH: rPushCommand,
   LRANGE: lRangeCommand,
