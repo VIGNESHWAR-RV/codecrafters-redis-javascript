@@ -23,7 +23,7 @@ function xRangeCommand(stream_key, start, end = -1) {
   );
 
   for (let i = 0; i < entries.length; i++) {
-    const { id, args } = entries[0];
+    const { id, args } = entries[i];
     const [entryMilliSecondId, entrySequenceId] = id;
     console.log(entryMilliSecondId, entrySequenceId);
     if (
