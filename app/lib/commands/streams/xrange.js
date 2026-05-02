@@ -31,7 +31,7 @@ function xRangeCommand(stream_key, start, end = -1) {
       entrySequenceId >= startSequenceId
     ) {
       let resEntry = [];
-      const endcodedId = encodeToRespBulkString(id.join("-"));
+      const encodedId = encodeToRespBulkString(id.join("-"));
       const encodedArgs = args.map(encodeToRespBulkString);
       resEntry.push(encodedId, encodedArgs);
       res.push(encodeToRespArray(resEntry));
