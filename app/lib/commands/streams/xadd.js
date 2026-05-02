@@ -20,6 +20,7 @@ function xAddCommand(stream_key, entryId, ...args) {
 
   entries.push(entryObj);
 
+  console.log(`Entry ID 3 - ${entryId}`);
   const res = encodeToRespBulkString(entryId);
   console.log(`res - ${res}`);
   return res;
