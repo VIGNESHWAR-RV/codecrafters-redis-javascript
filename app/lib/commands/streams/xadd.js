@@ -24,7 +24,7 @@ function xAddCommand(stream_key, entryId, ...args) {
 
     // convert asterik characters
     if (milliSecondId === "*") {
-      milliSecondId = lastMilliSecondId;
+      milliSecondId = Date.now();
     }
     milliSecondId = +milliSecondId;
 
