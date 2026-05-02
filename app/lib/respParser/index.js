@@ -37,6 +37,7 @@ function encodeToRespNullArray() {
 
 function encodeToRespError(err) {
   let error = err ? err : new Error("unknown error");
+  error.name = "ERR";
   const res = RespParser.encodeError(error);
   return res;
 }
