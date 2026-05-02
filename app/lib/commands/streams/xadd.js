@@ -17,7 +17,7 @@ function xAddCommand(stream_key, entryId, ...args) {
       redisLookup[stream_key] = { entries, type: "stream" };
     }
 
-    let [milliSecondId, sequenceId] = entryId.split("-");
+    let [milliSecondId, sequenceId = "*"] = entryId.split("-");
 
     const lastEntry = entries?.[entries.length - 1];
     const [lastMilliSecondId, lastSequenceId] = lastEntry?.id ?? [0, 0];
