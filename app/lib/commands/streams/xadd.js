@@ -31,6 +31,7 @@ function xAddCommand(stream_key, entryId, ...args) {
       idSequence,
       lastEntryIdMilliSecond,
       lastEntryIdSequence,
+      !!lastEntry,
     );
 
     // convert asterik characters
