@@ -36,7 +36,7 @@ function xReadCommand(type, ...streamKeysAndIds) {
 
     res.push([encodeToRespBulkString(stream_key), resRecords]);
   }
-  return encodeToRespArray([res]);
+  return encodeToRespArray(res);
 }
 
 module.exports = {
