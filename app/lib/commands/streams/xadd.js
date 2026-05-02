@@ -32,7 +32,7 @@ function xAddCommand(stream_key, entryId, ...args) {
       if (!lastEntry && idMilliSecond !== "0") {
         idSequence = 0;
       } else {
-        idSequence = lastEntryIdSequence++;
+        idSequence = lastEntryIdSequence + 1;
       }
     }
 
