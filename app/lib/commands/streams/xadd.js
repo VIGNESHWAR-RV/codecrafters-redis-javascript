@@ -3,7 +3,7 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { encodeToRespBulkString } = require("../../respParser");
 
 function xAddCommand(stream_key, entryId, ...args) {
-  console.log(`EntryId - ${entryId}`);
+  logger.info(`EntryId - ${entryId}`);
   let { entries } = redisLookup?.[stream_key] ?? {};
   if (!entries) {
     entries = [];
