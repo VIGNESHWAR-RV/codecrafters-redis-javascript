@@ -59,7 +59,7 @@ function xAddCommand(stream_key, entryId, ...args) {
     const res = encodeToRespBulkString(entryObj.id.join("-"));
     return res;
   } catch (err) {
-    logger.error(err.stack);
+    console.error(err.stack);
     const res = encodeToRespError(err);
     return res;
   }
