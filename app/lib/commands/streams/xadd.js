@@ -33,8 +33,10 @@ function xAddCommand(stream_key, entryId, ...args) {
     if (idSequence === "*") {
       if (!lastEntry && idMilliSecond === "0") {
         idSequence = 1;
-      } else {
+      } else if (lastEntry && idMilliSecond === lastEntryIdMilliSecond) {
         idSequence = lastEntryIdSequence + 1;
+      } else {
+        idSequence = 0;
       }
     }
 
