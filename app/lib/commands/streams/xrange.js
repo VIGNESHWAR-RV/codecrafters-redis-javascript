@@ -5,14 +5,16 @@ const {
   encodeToRespArray,
 } = require("../../respParser");
 
-function xRangeCommand(stream_key, start = "-", end = -1) {
+function xRangeCommand(stream_key, start = "-", end = "+") {
   let { entries } = redisLookup?.[stream_key] ?? {};
 
   const res = [];
   const [startMilliSecondId, startSequenceId] =
     start !== "-" ? start.split("-").map((el) => +el) : [0, 1];
   const [endMilliSecondId, endSequenceId] =
-    end?.split("-")?.map((el) => +el) ?? entries[entries.length - 1].id;
+    end !== "+"
+      ? end.split("-").map((el) => +el)
+      : entries[entries.length - 1].id;
 
   logger.debug(
     entries.length,
