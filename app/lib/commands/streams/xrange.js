@@ -14,18 +14,17 @@ function xRangeCommand(stream_key, start, end = -1) {
   const [endMilliSecondId, endSequenceId] =
     end?.split("-")?.map((el) => +el) ?? entries[entries.length - 1].id;
 
-  console.log(
+  logger.debug(
+    entries.length,
     startMilliSecondId,
     startSequenceId,
     endMilliSecondId,
     endSequenceId,
-    entries.length,
   );
 
   for (let i = 0; i < entries.length; i++) {
     const { id, args } = entries[i];
     const [entryMilliSecondId, entrySequenceId] = id;
-    console.log(entryMilliSecondId, entrySequenceId);
     if (
       entryMilliSecondId >= startMilliSecondId &&
       entrySequenceId >= startSequenceId
