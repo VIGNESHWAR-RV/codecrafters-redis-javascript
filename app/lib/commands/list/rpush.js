@@ -5,8 +5,8 @@ const { notifyBlPopObservers } = require("./blpop");
 function rPushCommand(listName, ...values) {
   let { list } = redisLookup?.[listName] ?? {};
   if (!list) {
-    redisLookup[listName] = { list: [], type: "list" };
-    list = redisLookup[listName];
+    list = [];
+    redisLookup[listName] = { list, type: "list" };
   }
 
   list.push(...values);
