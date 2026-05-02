@@ -26,13 +26,14 @@ function xReadCommand(type, ...streamKeysAndIds) {
       .map((el) => +el);
 
     const resRecords = [];
-    entries?.forEach(({ id, args }) => {
+    for (let k = 0; k < entries.length; k++) {
+      const { id, args } = entries[k];
       if (id[0] >= queryMilliSecondId && id[1] > querySequenceId) {
         const encodedRecordId = encodeToRespBulkString(id.join("-"));
         const encodedArgs = args.map(encodeToRespBulkString);
         resRecords.push([encodedRecordId, encodedArgs]);
       }
-    });
+    }
 
     res.push([encodeToRespBulkString(stream_key), resRecords]);
   }
