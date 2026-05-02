@@ -14,15 +14,11 @@ function xReadCommand(type, stream_key, id) {
     if (id[0] >= queryMilliSecondId && id[1] > querySequenceId) {
       const encodedRecordId = encodeToRespBulkString(id.join("-"));
       const encodedArgs = args.map(encodeToRespBulkString);
-      const resEntryRecord = encodeToRespArray([encodedRecordId, encodedArgs]);
-      resRecords.push(resRecords);
+      resRecords.push([encodedRecordId, encodedArgs]);
     }
   });
 
-  const res = [
-    encodeToRespBulkString(stream_key),
-    encodeToRespArray(resRecords),
-  ];
+  const res = [encodeToRespBulkString(stream_key), resRecords];
 
   console.log(encodeToRespArray(res).toString());
   return encodeToRespArray(res);
