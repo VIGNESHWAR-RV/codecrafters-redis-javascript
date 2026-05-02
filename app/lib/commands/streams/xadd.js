@@ -11,14 +11,16 @@ const SMALLER_ERROR_MESSAGE =
 
 function xAddCommand(stream_key, entryId, ...args) {
   try {
-    let { entries } = redisLookup?.[stream_key] ?? {};
     const [idMilliSecond, idSequence] = entryId.split("-").map((el) => +el);
+    if (idMilliSecond === 0 && idSequence === 0) {
+      throw new Error(ZERO_ERROR_MESSAGE);
+    }
+
+    let { entries } = redisLookup?.[stream_key] ?? {};
+
     if (!entries) {
       entries = [];
       redisLookup[stream_key] = { entries, type: "stream" };
-      if (idMilliSecond === 0 && idSequence === 0) {
-        throw new Error(ZERO_ERROR_MESSAGE);
-      }
     }
 
     const lastEntry = entries[entries.length - 1];
