@@ -14,6 +14,14 @@ function xRangeCommand(stream_key, start, end = -1) {
   const [endMilliSecondId, endSequenceId] =
     end?.split("-")?.map((el) => +el) ?? entries[entries.length - 1].id;
 
+  console.log(
+    startMilliSecondId,
+    startSequenceId,
+    endMilliSecondId,
+    endSequenceId,
+    entries.length,
+  );
+
   for (let i = 0; i < entries.length; i++) {
     const { id, args } = entries[0];
     const [entryMilliSecondId, entrySequenceId] = id;
