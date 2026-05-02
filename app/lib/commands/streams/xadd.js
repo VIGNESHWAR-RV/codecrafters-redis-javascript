@@ -25,22 +25,26 @@ function xAddCommand(stream_key, entryId, ...args) {
     ];
 
     let [idMilliSecond, idSequence] = entryId.split("-");
+
+    // convert asterik characters
     if (idMilliSecond === "*") {
       idMilliSecond = lastEntryIdMilliSecond;
     }
     if (idSequence === "*") {
-      if (idMilliSecond !== "0") {
-        idSequence = 0;
+      if (!lastEntry && idMilliSecond === "0") {
+        idSequence = 1;
       } else {
         idSequence = lastEntryIdSequence + 1;
       }
     }
 
+    // check conditions
     if (idMilliSecond === "0" && idSequence === "0") {
       throw new Error(ZERO_ERROR_MESSAGE);
-    } else if (+idMilliSecond < lastEntryIdMilliSecond) {
+    } else if (lastEntry && +idMilliSecond < lastEntryIdMilliSecond) {
       throw new Error(SMALLER_ERROR_MESSAGE);
     } else if (
+      lastEntry &&
       +idMilliSecond === lastEntryIdMilliSecond &&
       +idSequence <= lastEntryIdSequence
     ) {
