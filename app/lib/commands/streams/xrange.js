@@ -1,3 +1,4 @@
+const { logger } = require("../../contextualLogger");
 const { redisLookup } = require("../../inMemoryLookup");
 const {
   encodeToRespBulkString,
