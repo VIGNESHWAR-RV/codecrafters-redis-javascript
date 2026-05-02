@@ -26,6 +26,13 @@ function xAddCommand(stream_key, entryId, ...args) {
 
     let [idMilliSecond, idSequence] = entryId.split("-");
 
+    console.log(
+      idMilliSecond,
+      idSequence,
+      lastEntryIdMilliSecond,
+      lastEntryIdSequence,
+    );
+
     // convert asterik characters
     if (idMilliSecond === "*") {
       idMilliSecond = lastEntryIdMilliSecond;
