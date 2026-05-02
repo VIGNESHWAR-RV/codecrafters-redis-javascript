@@ -16,9 +16,8 @@ function xAddCommand(stream_key, entryId, ...args) {
     let key = args[i];
     let value = args[i + 1];
     entryObj[key] = value;
+    console.log(`entryObj - ${entryObj}`);
   }
-
-  console.log(`entryObj - ${entryObj}`);
 
   entries.push(entryObj);
 
