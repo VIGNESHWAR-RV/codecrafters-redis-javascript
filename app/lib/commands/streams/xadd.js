@@ -24,7 +24,7 @@ function xAddCommand(stream_key, entryId, ...args) {
       0, 0,
     ];
 
-    const [idMilliSecond, idSequence] = entryId.split("-");
+    let [idMilliSecond, idSequence] = entryId.split("-");
     if (idMilliSecond === "*") {
       idMilliSecond = lastEntryIdMilliSecond;
     }
