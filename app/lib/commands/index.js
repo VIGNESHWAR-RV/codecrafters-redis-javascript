@@ -15,6 +15,7 @@ const { blPopCommand } = require("./list/blpop");
 // streams
 const { xAddCommand } = require("./streams/xadd");
 const { xRangeCommand } = require("./streams/xrange");
+const { xReadCommand } = require("./streams/xread");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -32,6 +33,7 @@ const AVAILABLE_COMMANDS = {
 
   XADD: xAddCommand,
   XRANGE: xRangeCommand,
+  XREAD: xReadCommand,
 };
 
 module.exports = {
