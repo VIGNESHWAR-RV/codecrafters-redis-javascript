@@ -3,17 +3,8 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { logger } = require("../../contextualLogger");
 
 function typeCommand(key) {
-  const { value } = redisLookup?.[key] ?? {};
-  let res;
-  switch (typeof value) {
-    case "string":
-      res = "string";
-      break;
-    default:
-      res = "none";
-  }
-
-  return encodeToRespString(res);
+  const { value, type = "none" } = redisLookup?.[key] ?? {};
+  return encodeToRespString(type);
 }
 
 module.exports = {

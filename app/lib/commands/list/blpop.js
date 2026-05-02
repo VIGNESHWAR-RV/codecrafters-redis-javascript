@@ -32,11 +32,11 @@ function notifyBlPopObservers(list) {
 async function blPopCommand(listName, timer = 0) {
   try {
     timer = +timer;
-    let list = redisLookup[listName];
+    let { list } = redisLookup?.[listName] ?? {};
 
     if (!list) {
       list = [];
-      redisLookup[listName] = list;
+      redisLookup[listName] = { list, type: "list" };
     }
 
     let result;

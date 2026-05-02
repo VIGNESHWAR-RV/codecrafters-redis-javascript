@@ -7,7 +7,7 @@ const {
 
 function lPopCommand(listName, elementsCount = 1) {
   elementsCount = +elementsCount;
-  const list = redisLookup[listName];
+  const { list } = redisLookup?.[listName] ?? {};
 
   if (!list) {
     return encodeToRespBulkString(null);

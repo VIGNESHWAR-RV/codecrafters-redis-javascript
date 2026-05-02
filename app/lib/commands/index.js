@@ -4,6 +4,7 @@ const { echoCommand } = require("./basic/echo");
 const { pingCommand } = require("./basic/ping");
 const { typeCommand } = require("./basic/type");
 
+// lists
 const { rPushCommand } = require("./list/rpush");
 const { lRangeCommand } = require("./list/lrange");
 const { lPushCommand } = require("./list/lpush");
@@ -11,10 +12,12 @@ const { lLenCommand } = require("./list/llen");
 const { lPopCommand } = require("./list/lpop");
 const { blPopCommand } = require("./list/blpop");
 
+// streams
+const { xAddCommand } = require("./streams/xadd");
+
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
   ECHO: echoCommand,
-
   GET: getCommand,
   SET: setCommand,
   TYPE: typeCommand,
@@ -25,6 +28,8 @@ const AVAILABLE_COMMANDS = {
   LLEN: lLenCommand,
   LPOP: lPopCommand,
   BLPOP: blPopCommand,
+
+  XADD: xAddCommand,
 };
 
 module.exports = {

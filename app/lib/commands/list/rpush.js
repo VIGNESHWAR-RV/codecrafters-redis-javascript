@@ -3,9 +3,9 @@ const { encodeToRespInteger } = require("../../respParser");
 const { notifyBlPopObservers } = require("./blpop");
 
 function rPushCommand(listName, ...values) {
-  let list = redisLookup[listName];
+  let { list } = redisLookup?.[listName] ?? {};
   if (!list) {
-    redisLookup[listName] = [];
+    redisLookup[listName] = { list: [], type: "list" };
     list = redisLookup[listName];
   }
 
