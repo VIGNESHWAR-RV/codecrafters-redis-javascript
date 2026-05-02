@@ -12,48 +12,47 @@ const SMALLER_ERROR_MESSAGE =
 function xAddCommand(stream_key, entryId, ...args) {
   try {
     let { entries } = redisLookup?.[stream_key] ?? {};
-
     if (!entries) {
       entries = [];
       redisLookup[stream_key] = { entries, type: "stream" };
     }
 
+    let [milliSecondId, sequenceId] = entryId.split("-");
+
     const lastEntry = entries?.[entries.length - 1];
-
-    const [lastEntryIdMilliSecond, lastEntryIdSequence] = lastEntry?.id ?? [
-      0, 0,
-    ];
-
-    let [idMilliSecond, idSequence] = entryId.split("-");
+    const [lastMilliSecondId, lastSequenceId] = lastEntry?.id ?? [0, 0];
 
     // convert asterik characters
-    if (idMilliSecond === "*") {
-      idMilliSecond = lastEntryIdMilliSecond;
+    if (milliSecondId === "*") {
+      milliSecondId = lastMilliSecondId;
     }
-    if (idSequence === "*") {
-      if (!lastEntry && idMilliSecond === "0") {
-        idSequence = 1;
-      } else if (lastEntry && idMilliSecond == lastEntryIdMilliSecond) {
-        idSequence = lastEntryIdSequence + 1;
+    milliSecondId = +milliSecondId;
+
+    if (sequenceId === "*") {
+      if (!lastEntry && milliSecondId === 0) {
+        sequenceId = 1;
+      } else if (lastEntry && milliSecondId === lastMilliSecondId) {
+        sequenceId = lastSequenceId + 1;
       } else {
-        idSequence = 0;
+        sequenceId = 0;
       }
     }
+    sequenceId = +sequenceId;
 
     // check conditions
-    if (idMilliSecond === "0" && idSequence === "0") {
+    if (milliSecondId === 0 && sequenceId === 0) {
       throw new Error(ZERO_ERROR_MESSAGE);
-    } else if (lastEntry && +idMilliSecond < lastEntryIdMilliSecond) {
+    } else if (lastEntry && milliSecondId < lastMilliSecondId) {
       throw new Error(SMALLER_ERROR_MESSAGE);
     } else if (
       lastEntry &&
-      +idMilliSecond === lastEntryIdMilliSecond &&
-      +idSequence <= lastEntryIdSequence
+      +milliSecondId === lastMilliSecondId &&
+      +sequenceId <= lastSequenceId
     ) {
       throw new Error(SMALLER_ERROR_MESSAGE);
     }
 
-    let entryObj = { id: [+idMilliSecond, +idSequence] };
+    let entryObj = { id: [milliSecondId, sequenceId] };
     for (let i = 0; i < args.length; i = i + 2) {
       let key = args[i];
       let value = args[i + 1];
@@ -65,7 +64,7 @@ function xAddCommand(stream_key, entryId, ...args) {
     const res = encodeToRespBulkString(entryObj.id.join("-"));
     return res;
   } catch (err) {
-    console.error(err.stack);
+    logger.error(err.stack);
     const res = encodeToRespError(err);
     return res;
   }
