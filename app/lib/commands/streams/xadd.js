@@ -10,13 +10,15 @@ function xAddCommand(stream_key, entryId, ...args) {
     redisLookup[stream_key] = { entries, type: "stream" };
   }
 
-  console.log(`Entry Id 2 - ${entryId}`);
+  console.log(`Entry Id 2 - ${entryId}, ${args.length}`);
   let entryObj = { id: entryId };
   for (let i = 0; i < args.length; i + 2) {
     let key = args[i];
     let value = args[i + 1];
     entryObj[key] = value;
   }
+
+  console.log(`entryObj - ${entryObj}`);
 
   entries.push(entryObj);
 
