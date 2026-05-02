@@ -52,12 +52,8 @@ function xAddCommand(stream_key, entryId, ...args) {
       throw new Error(SMALLER_ERROR_MESSAGE);
     }
 
-    let entryObj = { id: [milliSecondId, sequenceId] };
-    for (let i = 0; i < args.length; i = i + 2) {
-      let key = args[i];
-      let value = args[i + 1];
-      entryObj[key] = value;
-    }
+    let entryObj = { id: [milliSecondId, sequenceId], args };
+
 
     entries.push(entryObj);
 
