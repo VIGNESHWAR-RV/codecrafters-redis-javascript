@@ -10,14 +10,10 @@ function xReadCommand(type, stream_key, id) {
   const [queryMilliSecondId, querySequenceId] = id?.split("-").map((el) => +el);
 
   const resRecords = [];
-  const queriedRecord = entries?.forEach(({ id }) => {
+  entries?.forEach(({ id, args }) => {
     if (id[0] >= queryMilliSecondId && id[1] > querySequenceId) {
-      const encodedRecordId = encodeToRespBulkString(
-        queriedRecord.id.join("-"),
-      );
-      const encodedArgs = encodeToRespArray(
-        queriedRecord.args.map(encodeToRespBulkString),
-      );
+      const encodedRecordId = encodeToRespBulkString(id.join("-"));
+      const encodedArgs = encodeToRespArray(args.map(encodeToRespBulkString));
       const resEntryRecord = encodeToRespArray([encodedRecordId, encodedArgs]);
       resRecords.push(resRecords);
     }
