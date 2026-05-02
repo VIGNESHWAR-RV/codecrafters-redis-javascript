@@ -40,6 +40,13 @@ function xAddCommand(stream_key, entryId, ...args) {
       }
     }
 
+    console.log(
+      idMilliSecond,
+      idSequence,
+      lastEntryIdMilliSecond,
+      lastEntryIdSequence,
+    );
+
     // check conditions
     if (idMilliSecond === "0" && idSequence === "0") {
       throw new Error(ZERO_ERROR_MESSAGE);
