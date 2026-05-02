@@ -26,14 +26,6 @@ function xAddCommand(stream_key, entryId, ...args) {
 
     let [idMilliSecond, idSequence] = entryId.split("-");
 
-    console.log(
-      idMilliSecond,
-      idSequence,
-      lastEntryIdMilliSecond,
-      lastEntryIdSequence,
-      !!lastEntry,
-    );
-
     // convert asterik characters
     if (idMilliSecond === "*") {
       idMilliSecond = lastEntryIdMilliSecond;
@@ -41,19 +33,12 @@ function xAddCommand(stream_key, entryId, ...args) {
     if (idSequence === "*") {
       if (!lastEntry && idMilliSecond === "0") {
         idSequence = 1;
-      } else if (lastEntry && idMilliSecond === lastEntryIdMilliSecond) {
+      } else if (lastEntry && idMilliSecond == lastEntryIdMilliSecond) {
         idSequence = lastEntryIdSequence + 1;
       } else {
         idSequence = 0;
       }
     }
-
-    console.log(
-      idMilliSecond,
-      idSequence,
-      lastEntryIdMilliSecond,
-      lastEntryIdSequence,
-    );
 
     // check conditions
     if (idMilliSecond === "0" && idSequence === "0") {
