@@ -21,6 +21,7 @@ function xReadCommand(type, stream_key, id) {
 
   const res = [encodeToRespBulkString(stream_key), resRecords];
 
+  console.log(encodeToRespArray(res).toString());
   return encodeToRespArray(res);
 }
 
