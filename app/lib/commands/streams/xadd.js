@@ -11,11 +11,6 @@ const SMALLER_ERROR_MESSAGE =
 
 function xAddCommand(stream_key, entryId, ...args) {
   try {
-    const [idMilliSecond, idSequence] = entryId.split("-").map((el) => +el);
-    if (idMilliSecond === 0 && idSequence === 0) {
-      throw new Error(ZERO_ERROR_MESSAGE);
-    }
-
     let { entries } = redisLookup?.[stream_key] ?? {};
 
     if (!entries) {
@@ -23,22 +18,36 @@ function xAddCommand(stream_key, entryId, ...args) {
       redisLookup[stream_key] = { entries, type: "stream" };
     }
 
-    const lastEntry = entries[entries.length - 1];
-    if (lastEntry) {
-      const [lastEntryIdMilliSecond, lastEntryIdSequence] = lastEntry.id
-        .split("-")
-        .map((el) => +el);
-      if (idMilliSecond < lastEntryIdMilliSecond) {
-        throw new Error(SMALLER_ERROR_MESSAGE);
-      } else if (
-        idMilliSecond === lastEntryIdMilliSecond &&
-        idSequence <= lastEntryIdSequence
-      ) {
-        throw new Error(SMALLER_ERROR_MESSAGE);
+    const lastEntry = entries?.[entries.length - 1];
+
+    const [lastEntryIdMilliSecond, lastEntryIdSequence] = lastEntry?.id ?? [
+      0, 0,
+    ];
+
+    const [idMilliSecond, idSequence] = entryId.split("-");
+    if (idMilliSecond === "*") {
+      idMilliSecond = lastEntryIdMilliSecond;
+    }
+    if (idSequence === "*") {
+      if (!lastEntry && idMilliSecond !== "0") {
+        idSequence = 0;
+      } else {
+        idSequence = lastEntryIdSequence++;
       }
     }
 
-    let entryObj = { id: entryId };
+    if (idMilliSecond === "0" && idSequence === "0") {
+      throw new Error(ZERO_ERROR_MESSAGE);
+    } else if (+idMilliSecond < lastEntryIdMilliSecond) {
+      throw new Error(SMALLER_ERROR_MESSAGE);
+    } else if (
+      +idMilliSecond === lastEntryIdMilliSecond &&
+      +idSequence <= lastEntryIdSequence
+    ) {
+      throw new Error(SMALLER_ERROR_MESSAGE);
+    }
+
+    let entryObj = { id: [+idMilliSecond, +idSequence] };
     for (let i = 0; i < args.length; i = i + 2) {
       let key = args[i];
       let value = args[i + 1];
@@ -47,7 +56,7 @@ function xAddCommand(stream_key, entryId, ...args) {
 
     entries.push(entryObj);
 
-    const res = encodeToRespBulkString(entryId);
+    const res = encodeToRespBulkString(entryObj.id.join("-"));
     return res;
   } catch (err) {
     logger.error(err.stack);
