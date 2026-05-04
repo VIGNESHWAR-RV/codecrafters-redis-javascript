@@ -22,18 +22,20 @@ function getStreamKeysAndIdsFromArgs(args) {
 
   const argsLength = args.length / 2;
   for (let i = 0; i < argsLength; i++) {
+    const stream_key = args[i];
+    let id = args[i + argsLength];
+    if (id === "$") {
+      const { entries } = redisLookup?.[args[i]] ?? {
+        entries: [{ id: [0, 0] }],
+      };
+
+      id = entries[entries.length - 1].id;
+    } else {
+      id = id.split("-").map((el, index) => +el);
+    }
     streamKeysAndIds.push({
-      stream_key: args[i],
-      id: args[i + argsLength].split("-").map((el, index) => {
-        if (el === "$") {
-          const { entries } = redisLookup?.[args[i]] ?? {
-            entries: [{ id: [0, 0] }],
-          };
-          return entries[entries.length - 1].id;
-        } else {
-          return +el;
-        }
-      }),
+      stream_key,
+      id,
     });
   }
 
@@ -132,7 +134,6 @@ async function xReadCommand(type, ...args) {
                 );
 
                 if (!isStreamKeysYetToBeObserved) {
-                  console.log(JSON.stringify(streamKeysAndIds));
                   const response = readStreamKeysAndIds(streamKeysAndIds);
                   resolve(response);
                 }
