@@ -71,120 +71,117 @@ function readStreamKeysAndIds(streamKeysAndIds) {
 
 async function xReadCommand(type, ...args) {
   try {
-    switch (type) {
-      case "BLOCK": {
-        const [blockMilliSecond, streamType, ...actualArgs] = args;
-        const streamKeysAndIds = getStreamKeysAndIdsFromArgs(actualArgs);
-        let [result, isAllStreamRecordsPresent] =
-          readStreamKeysAndIds(streamKeysAndIds);
+    if (type === "BLOCK") {
+      const [blockMilliSecond, streamType, ...actualArgs] = args;
+      const streamKeysAndIds = getStreamKeysAndIdsFromArgs(actualArgs);
+      let [result, isAllStreamRecordsPresent] =
+        readStreamKeysAndIds(streamKeysAndIds);
 
-        if (!isAllStreamRecordsPresent) {
-          [result, isAllStreamRecordsPresent] = await new Promise(
-            (resolve, reject) => {
-              let timerId;
+      if (!isAllStreamRecordsPresent) {
+        [result, isAllStreamRecordsPresent] = await new Promise(
+          (resolve, reject) => {
+            let timerId;
 
-              const callback = (updatedStreamKey) => {
-                const observedStreamkey = streamKeysAndIds.find(
-                  ({ stream_key }) => stream_key === updatedStreamKey,
-                );
+            const callback = (updatedStreamKey) => {
+              const observedStreamkey = streamKeysAndIds.find(
+                ({ stream_key }) => stream_key === updatedStreamKey,
+              );
 
-                if (!observedStreamkey) {
-                  const observersList =
-                    streamObserversLookup.get(updatedStreamKey);
-                  if (observersList) {
-                    const index = observersList.indexOf(callback);
-                    if (index > -1) observersList.splice(index, 1);
-                    if (!observersList.length) {
-                      streamObserversLookup.delete(stream_key);
-                    }
+              if (!observedStreamkey) {
+                const observersList =
+                  streamObserversLookup.get(updatedStreamKey);
+                if (observersList) {
+                  const index = observersList.indexOf(callback);
+                  if (index > -1) observersList.splice(index, 1);
+                  if (!observersList.length) {
+                    streamObserversLookup.delete(stream_key);
                   }
                 }
+              }
 
-                const { entries } = redisLookup[observedStreamkey.stream_key];
-                const isRecordsPresent = entries.find(({ id }) => {
-                  const [milliSecondId, sequenceId] = id;
-                  const [observedMilliSecondId, observedSequenceId] =
-                    observedStreamkey.id;
-                  return (
-                    observedMilliSecondId >= milliSecondId &&
-                    observedSequenceId > sequenceId
-                  );
-                });
-
-                if (isRecordsPresent) {
-                  observedStreamkey.isRecordsPresent = true;
-                  const observersList = streamObserversLookup.get(
-                    observedStreamkey.stream_key,
-                  );
-                  if (observersList) {
-                    const index = observersList.indexOf(callback);
-                    if (index > -1) observersList.splice(index, 1);
-                    if (!observersList.length) {
-                      streamObserversLookup.delete(stream_key);
-                    }
-                  }
-                }
-
-                const isStreamKeysYetToBeObserved = streamKeysAndIds.find(
-                  ({ isRecordsPresent }) => !isRecordsPresent,
+              const { entries } = redisLookup[observedStreamkey.stream_key];
+              const isRecordsPresent = entries.find(({ id }) => {
+                const [milliSecondId, sequenceId] = id;
+                const [observedMilliSecondId, observedSequenceId] =
+                  observedStreamkey.id;
+                return (
+                  observedMilliSecondId >= milliSecondId &&
+                  observedSequenceId > sequenceId
                 );
-
-                if (!isStreamKeysYetToBeObserved) {
-                  const response = readStreamKeysAndIds(streamKeysAndIds);
-                  resolve(response);
-                }
-              };
-
-              streamKeysAndIds.forEach(({ stream_key }) => {
-                let observersList = streamObserversLookup.get(stream_key);
-                if (!observersList) {
-                  observersList = [];
-                  observersLookup.set(stream_key, observersList);
-                }
-                observersList.push(callback);
               });
 
-              if (blockMilliSecond) {
-                logger.debug(`setting timer - ${blockMilliSecond}`);
-                timerId = setTimeout(() => {
-                  streamKeysAndIds.forEach(({ stream_key }) => {
-                    const observersList = streamObserversLookup.get(stream_key);
-                    if (observersList) {
-                      const index = observersList.indexOf(callback);
-                      if (index > -1) observersList.splice(index, 1);
-                      if (!observersList.length) {
-                        streamObserversLookup.delete(stream_key);
-                      }
-                    }
-                  });
-                  reject(
-                    new Error(
-                      `client given wait time is over - ${blockMilliSecond} milli seconds`,
-                    ),
-                  );
-                }, blockMilliSecond);
+              if (isRecordsPresent) {
+                observedStreamkey.isRecordsPresent = true;
+                const observersList = streamObserversLookup.get(
+                  observedStreamkey.stream_key,
+                );
+                if (observersList) {
+                  const index = observersList.indexOf(callback);
+                  if (index > -1) observersList.splice(index, 1);
+                  if (!observersList.length) {
+                    streamObserversLookup.delete(stream_key);
+                  }
+                }
               }
-            },
-          );
-        }
 
-        if (isAllStreamRecordsPresent) {
-          return encodeToRespArray(result);
-        } else {
-          return encodeToRespNullArray();
-        }
+              const isStreamKeysYetToBeObserved = streamKeysAndIds.find(
+                ({ isRecordsPresent }) => !isRecordsPresent,
+              );
+
+              if (!isStreamKeysYetToBeObserved) {
+                const response = readStreamKeysAndIds(streamKeysAndIds);
+                resolve(response);
+              }
+            };
+
+            streamKeysAndIds.forEach(({ stream_key }) => {
+              let observersList = streamObserversLookup.get(stream_key);
+              if (!observersList) {
+                observersList = [];
+                observersLookup.set(stream_key, observersList);
+              }
+              observersList.push(callback);
+            });
+
+            if (blockMilliSecond) {
+              logger.debug(`setting timer - ${blockMilliSecond}`);
+              timerId = setTimeout(() => {
+                streamKeysAndIds.forEach(({ stream_key }) => {
+                  const observersList = streamObserversLookup.get(stream_key);
+                  if (observersList) {
+                    const index = observersList.indexOf(callback);
+                    if (index > -1) observersList.splice(index, 1);
+                    if (!observersList.length) {
+                      streamObserversLookup.delete(stream_key);
+                    }
+                  }
+                });
+                reject(
+                  new Error(
+                    `client given wait time is over - ${blockMilliSecond} milli seconds`,
+                  ),
+                );
+              }, blockMilliSecond);
+            }
+          },
+        );
       }
-      default: {
-        const streamKeysAndIds = getStreamKeysAndIdsFromArgs(args);
 
-        const [result, isAllStreamRecordsPresent] =
-          readStreamKeysAndIds(streamKeysAndIds);
+      if (isAllStreamRecordsPresent) {
+        return encodeToRespArray(result);
+      } else {
+        return encodeToRespNullArray();
+      }
+    } else {
+      const streamKeysAndIds = getStreamKeysAndIdsFromArgs(args);
 
-        if (isAllStreamRecordsPresent) {
-          return encodeToRespArray(result);
-        } else {
-          return encodeToRespNullArray();
-        }
+      const [result, isAllStreamRecordsPresent] =
+        readStreamKeysAndIds(streamKeysAndIds);
+
+      if (isAllStreamRecordsPresent) {
+        return encodeToRespArray(result);
+      } else {
+        return encodeToRespNullArray();
       }
     }
   } catch (err) {
