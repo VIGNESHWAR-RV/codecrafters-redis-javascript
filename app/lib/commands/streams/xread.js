@@ -146,7 +146,7 @@ async function xReadCommand(type, ...args) {
                 observersList.push(callback);
               });
 
-              if (blockMilliSecond) {
+              if (+blockMilliSecond) {
                 logger.debug(`setting timer - ${blockMilliSecond}`);
                 timerId = setTimeout(() => {
                   streamKeysAndIds.forEach(({ stream_key }) => {
@@ -164,7 +164,7 @@ async function xReadCommand(type, ...args) {
                       `client given wait time is over - ${blockMilliSecond} milli seconds`,
                     ),
                   );
-                }, blockMilliSecond);
+                }, +blockMilliSecond);
               }
             },
           );
