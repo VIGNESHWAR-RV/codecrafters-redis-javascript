@@ -176,8 +176,15 @@ async function xReadCommand(type, ...args) {
       }
       default: {
         const streamKeysAndIds = getStreamKeysAndIdsFromArgs(args);
+
+        console.log(JSON.stringify(streamKeysAndIds));
         const [result] = readStreamKeysAndIds(streamKeysAndIds);
-        return encodeToRespArray(result);
+
+        if (isAllStreamRecordsPresent) {
+          return encodeToRespArray(result);
+        } else {
+          return encodeToRespNullArray();
+        }
       }
     }
   } catch (err) {
