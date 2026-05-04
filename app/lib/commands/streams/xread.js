@@ -178,7 +178,8 @@ async function xReadCommand(type, ...args) {
         const streamKeysAndIds = getStreamKeysAndIdsFromArgs(args);
 
         console.log(JSON.stringify(streamKeysAndIds));
-        const [result] = readStreamKeysAndIds(streamKeysAndIds);
+        const [result, isAllStreamRecordsPresent] =
+          readStreamKeysAndIds(streamKeysAndIds);
 
         if (isAllStreamRecordsPresent) {
           return encodeToRespArray(result);
