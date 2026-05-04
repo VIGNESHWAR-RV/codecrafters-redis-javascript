@@ -29,6 +29,7 @@ function getStreamKeysAndIdsFromArgs(args) {
           const { entries } = redisLookup?.[args[i]] ?? {
             entries: [{ id: [0, 0] }],
           };
+          console.log(entries[entries.length - 1].id);
           return entries[entries.length - 1].id;
         } else {
           return +el;
