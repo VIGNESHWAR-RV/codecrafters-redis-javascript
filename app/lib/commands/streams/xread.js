@@ -138,7 +138,7 @@ async function xReadCommand(type, ...args) {
               let observersList = streamObserversLookup.get(stream_key);
               if (!observersList) {
                 observersList = [];
-                observersLookup.set(stream_key, observersList);
+                streamObserversLookup.set(stream_key, observersList);
               }
               observersList.push(callback);
             });
