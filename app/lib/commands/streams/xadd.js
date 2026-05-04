@@ -4,6 +4,7 @@ const {
   encodeToRespBulkString,
   encodeToRespError,
 } = require("../../respParser");
+const { notifyXReadObservers } = require("./xread");
 
 const ZERO_ERROR_MESSAGE = "The ID specified in XADD must be greater than 0-0";
 const SMALLER_ERROR_MESSAGE =
@@ -54,8 +55,9 @@ function xAddCommand(stream_key, entryId, ...args) {
 
     let entryObj = { id: [milliSecondId, sequenceId], args };
 
-
     entries.push(entryObj);
+
+    notifyXReadObservers(stream_key);
 
     const res = encodeToRespBulkString(entryObj.id.join("-"));
     return res;
