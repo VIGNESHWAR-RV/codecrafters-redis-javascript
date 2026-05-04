@@ -22,7 +22,7 @@ function getStreamKeysAndIdsFromArgs(args) {
 
   const argsLength = args.length / 2;
   for (let i = 0; i < argsLength; i++) {
-    console.log(args[i + argsLength]);
+    console.log(args[i + argsLength].split("-").map((el, index) => +el));
     streamKeysAndIds.push({
       stream_key: args[i],
       id: args[i + argsLength].split("-").map((el, index) => {
