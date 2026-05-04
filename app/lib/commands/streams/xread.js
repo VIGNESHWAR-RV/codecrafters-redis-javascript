@@ -45,7 +45,7 @@ function readStreamKeysAndIds(streamKeysAndIds) {
   for (let j = 0; j < streamKeysAndIds.length; j++) {
     const { stream_key, id } = streamKeysAndIds[j];
 
-    const { entries } = redisLookup[stream_key];
+    const { entries = [] } = redisLookup?.[stream_key] ?? {};
     const [queryMilliSecondId, querySequenceId] = id;
 
     const resRecords = [];
