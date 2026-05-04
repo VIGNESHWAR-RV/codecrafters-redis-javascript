@@ -25,12 +25,10 @@ function getStreamKeysAndIdsFromArgs(args) {
     streamKeysAndIds.push({
       stream_key: args[i],
       id: args[i + argsLength].split("-").map((el, index) => {
-        console.log(`element -  ${el}`);
         if (el === "$") {
           const { entries } = redisLookup?.[args[i]] ?? {
             entries: [{ id: [0, 0] }],
           };
-          console.log(entries[entries.length - 1].id);
           return entries[entries.length - 1].id;
         } else {
           return +el;
@@ -134,6 +132,7 @@ async function xReadCommand(type, ...args) {
                 );
 
                 if (!isStreamKeysYetToBeObserved) {
+                  console.log(JSON.stringify(streamKeysAndIds));
                   const response = readStreamKeysAndIds(streamKeysAndIds);
                   resolve(response);
                 }
