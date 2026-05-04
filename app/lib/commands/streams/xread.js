@@ -71,7 +71,7 @@ function readStreamKeysAndIds(streamKeysAndIds) {
 
 async function xReadCommand(type, ...args) {
   try {
-    if (type === "BLOCK") {
+    if (type.toUpperCase() === "BLOCK") {
       const [blockMilliSecond, streamType, ...actualArgs] = args;
       const streamKeysAndIds = getStreamKeysAndIdsFromArgs(actualArgs);
       let [result, isAllStreamRecordsPresent] =
