@@ -17,6 +17,9 @@ const { xAddCommand } = require("./streams/xadd");
 const { xRangeCommand } = require("./streams/xrange");
 const { xReadCommand } = require("./streams/xread");
 
+// transactions
+const { incrCommand } = require("./transactions/incr");
+
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
   ECHO: echoCommand,
@@ -34,6 +37,8 @@ const AVAILABLE_COMMANDS = {
   XADD: xAddCommand,
   XRANGE: xRangeCommand,
   XREAD: xReadCommand,
+
+  INCR: incrCommand,
 };
 
 module.exports = {
