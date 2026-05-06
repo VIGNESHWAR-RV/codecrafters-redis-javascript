@@ -73,7 +73,7 @@ function readStreamKeysAndIds(streamKeysAndIds) {
   return [res, isAllStreamRecordsPresent];
 }
 
-async function xReadCommand(type, ...args) {
+async function xReadCommand(clientId, type, ...args) {
   try {
     switch (type.toUpperCase()) {
       case "BLOCK": {

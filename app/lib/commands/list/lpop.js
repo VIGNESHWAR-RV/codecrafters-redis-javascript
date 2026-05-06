@@ -5,7 +5,7 @@ const {
   encodeToRespArray,
 } = require("../../respParser");
 
-function lPopCommand(listName, elementsCount = 1) {
+function lPopCommand(clientId, listName, elementsCount = 1) {
   elementsCount = +elementsCount;
   const { list } = redisLookup?.[listName] ?? {};
 

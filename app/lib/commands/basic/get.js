@@ -4,7 +4,7 @@ const {
 } = require("../../respParser");
 const { redisLookup } = require("../../inMemoryLookup");
 
-function getCommand(key) {
+function getCommand(clientId, key) {
   let { value, expiryTimeStamp } = redisLookup?.[key] ?? {};
   if (expiryTimeStamp && Date.now() >= expiryTimeStamp) {
     delete redisLookup[key];

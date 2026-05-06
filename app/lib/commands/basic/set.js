@@ -1,7 +1,7 @@
 const { encodeToRespString } = require("../../respParser");
 const { redisLookup } = require("../../inMemoryLookup");
 
-function setCommand(key, value, expiryType, expiryValue) {
+function setCommand(clientId, key, value, expiryType, expiryValue) {
   const val = { value, type: "string" };
   if (expiryType) {
     if (expiryType.toUpperCase() === "EX") {

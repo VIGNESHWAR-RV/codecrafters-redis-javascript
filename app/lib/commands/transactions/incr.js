@@ -3,7 +3,7 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { encodeToRespInteger, encodeToRespError } = require("../../respParser");
 const { isNumber } = require("../../utils/typeUtil");
 
-function incrCommand(key) {
+function incrCommand(clientId, key) {
   try {
     let val = redisLookup[key];
 

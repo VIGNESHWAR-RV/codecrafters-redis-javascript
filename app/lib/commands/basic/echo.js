@@ -1,6 +1,6 @@
 const { encodeToRespBulkString } = require("../../respParser");
 
-function echoCommand(detailsToTalkBack) {
+function echoCommand(clientId, detailsToTalkBack) {
   const res = encodeToRespBulkString(detailsToTalkBack);
   return res;
 }

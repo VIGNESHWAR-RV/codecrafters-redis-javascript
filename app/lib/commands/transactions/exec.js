@@ -1,8 +1,8 @@
-const { redisLookup } = require("../../inMemoryLookup");
+const { clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespArray, encodeToRespError } = require("../../respParser");
 
-async function execCommand() {
-  const queuedCommands = redisLookup.multi;
+async function execCommand(clientId) {
+  const { queuedCommands } = clientLookup[clientId];
 
   if (!queuedCommands) {
     throw new Error("EXEC without MULTI");
@@ -21,7 +21,7 @@ async function execCommand() {
     }
   }
 
-  delete redisLookup.multi;
+  delete clientLookup[clientId].queuedCommands;
   return encodeToRespArray(finalResponse);
 }
 

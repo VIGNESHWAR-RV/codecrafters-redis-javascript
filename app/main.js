@@ -7,12 +7,14 @@ const {
   encodeToRespError,
   encodeToRespString,
 } = require("./lib/respParser");
-const { redisLookup } = require("./lib/inMemoryLookup");
+const { redisLookup, clientLookup } = require("./lib/inMemoryLookup");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 logger.info("Logs from your program will appear here!");
 
-async function executeAvailableCommand(reqData) {
+let clientCounter = 0;
+
+async function executeAvailableCommand(clientId, reqData) {
   const startTime = Date.now();
   try {
     const [reqType, ...reqDetails] = decodeResp(reqData);
@@ -21,13 +23,13 @@ async function executeAvailableCommand(reqData) {
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
-    const queuedCommands = redisLookup.multi;
+    const { queuedCommands } = clientLookup[clientId];
     if (queuedCommands && reqType.toUpperCase() !== "EXEC") {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");
       return res.toString();
     } else {
-      const res = await commandToBeExecuted(...reqDetails);
+      const res = await commandToBeExecuted(clientId, ...reqDetails);
       return res.toString();
     }
   } catch (err) {
@@ -41,12 +43,19 @@ async function executeAvailableCommand(reqData) {
 
 // Uncomment the code below to pass the first stage
 const server = net.createServer((connection) => {
+  const clientId = ++clientCounter;
+  clientLookup.set(clientId, { connection });
   // Handle connection
   connection.on("data", (data) => {
-    logger.initSubContext({ traceId: randomUUID() }, async () => {
-      const res = await executeAvailableCommand(data);
+    logger.initSubContext({ traceId: randomUUID(), clientId }, async () => {
+      const res = await executeAvailableCommand(clientId, data);
       connection.write(res);
     });
+  });
+
+  connection.end("end", () => {
+    logger.info(`client with id - ${clientId} closed the connection`);
+    clientLookup.delete(clientId);
   });
 });
 

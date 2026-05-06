@@ -5,7 +5,7 @@ const {
   encodeToRespArray,
 } = require("../../respParser");
 
-function xRangeCommand(stream_key, start = "-", end = "+") {
+function xRangeCommand(clientId, stream_key, start = "-", end = "+") {
   let { entries } = redisLookup?.[stream_key] ?? {};
 
   const res = [];

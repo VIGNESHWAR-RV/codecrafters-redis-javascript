@@ -2,7 +2,7 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { encodeToRespInteger } = require("../../respParser");
 const { notifyBlPopObservers } = require("./blpop");
 
-function lPushCommand(listName, ...values) {
+function lPushCommand(clientId, listName, ...values) {
   let { list } = redisLookup?.[listName] ?? {};
   if (!list) {
     list = [];

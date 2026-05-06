@@ -1,8 +1,8 @@
-const { redisLookup } = require("../../inMemoryLookup");
+const { redisLookup, clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespString } = require("../../respParser");
 
-function multiCommand() {
-  redisLookup.multi = [];
+function multiCommand(clientId) {
+  clientLookup[clientId].queuedCommands = [];
   return encodeToRespString("OK");
 }
 

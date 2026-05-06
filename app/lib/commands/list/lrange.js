@@ -5,7 +5,7 @@ const {
   encodeToRespBulkString,
 } = require("../../respParser");
 
-function lRangeCommand(listName, startIndex, endIndex) {
+function lRangeCommand(clientId, listName, startIndex, endIndex) {
   logger.info(startIndex, endIndex);
 
   startIndex = +startIndex;

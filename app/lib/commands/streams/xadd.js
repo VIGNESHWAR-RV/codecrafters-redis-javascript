@@ -10,7 +10,7 @@ const ZERO_ERROR_MESSAGE = "The ID specified in XADD must be greater than 0-0";
 const SMALLER_ERROR_MESSAGE =
   "The ID specified in XADD is equal or smaller than the target stream top item";
 
-function xAddCommand(stream_key, entryId, ...args) {
+function xAddCommand(clientId, stream_key, entryId, ...args) {
   try {
     let { entries } = redisLookup?.[stream_key] ?? {};
     if (!entries) {

@@ -1,6 +1,6 @@
 const { encodeToRespString } = require("../../respParser");
 
-function pingCommand() {
+function pingCommand(clientId) {
   const res = encodeToRespString("PONG");
   return res;
 }

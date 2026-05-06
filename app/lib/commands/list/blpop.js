@@ -29,7 +29,7 @@ function notifyBlPopObservers(list) {
   });
 }
 
-async function blPopCommand(listName, timer = 0) {
+async function blPopCommand(clientId, listName, timer = 0) {
   try {
     timer = +timer;
     let { list } = redisLookup?.[listName] ?? {};
