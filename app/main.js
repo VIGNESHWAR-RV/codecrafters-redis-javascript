@@ -23,7 +23,7 @@ async function executeAvailableCommand(clientId, reqData) {
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
-    const { queuedCommands } = clientLookup[clientId];
+    const { queuedCommands } = clientLookup.get(clientId);
     if (queuedCommands && reqType.toUpperCase() !== "EXEC") {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");

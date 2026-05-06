@@ -21,7 +21,7 @@ async function execCommand(clientId) {
     }
   }
 
-  delete clientLookup[clientId].queuedCommands;
+  delete clientLookup.get(clientId).queuedCommands;
   return encodeToRespArray(finalResponse);
 }
 
