@@ -47,6 +47,12 @@ const AVAILABLE_COMMANDS = {
   DISCARD: discardCommand,
 };
 
+const MULTI_EXCEPTION_COMMANDS = {
+  EXEC,
+  DISCARD,
+};
+
 module.exports = {
   AVAILABLE_COMMANDS,
+  MULTI_EXCEPTION_COMMANDS,
 };

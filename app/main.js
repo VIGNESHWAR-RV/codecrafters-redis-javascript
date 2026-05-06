@@ -1,6 +1,9 @@
 const net = require("net");
 const { randomUUID } = require("node:crypto");
-const { AVAILABLE_COMMANDS } = require("./lib/commands");
+const {
+  AVAILABLE_COMMANDS,
+  MULTI_EXCEPTION_COMMANDS,
+} = require("./lib/commands");
 const { logger } = require("./lib/contextualLogger");
 const {
   decodeResp,
@@ -25,17 +28,18 @@ async function executeAvailableCommand(clientId, reqData) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
     const { queuedCommands } = clientLookup[clientId];
-    if (queuedCommands && reqType.toUpperCase() !== "EXEC") {
+    if (queuedCommands && !MULTI_EXCEPTION_COMMANDS[reqType.toUpperCase()]) {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");
+      logger.debug("response details ->", res.toString());
       return res.toString();
     } else {
       const res = await commandToBeExecuted(clientId, ...reqDetails);
-      console.log("response details ->", res.toString());
+      logger.debug("response details ->", res.toString());
       return res.toString();
     }
   } catch (err) {
-    console.error(err.stack);
+    logger.error(err.stack);
     const res = encodeToRespError(err);
     return res.toString();
   } finally {
