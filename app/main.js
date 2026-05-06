@@ -19,7 +19,7 @@ async function executeAvailableCommand(clientId, reqData) {
   try {
     const [reqType, ...reqDetails] = decodeResp(reqData);
     logger.info(reqType);
-    logger.debug(reqDetails);
+    logger.debug(`request details ->`, reqDetails);
     const commandToBeExecuted = AVAILABLE_COMMANDS[reqType.toUpperCase()];
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
@@ -31,7 +31,7 @@ async function executeAvailableCommand(clientId, reqData) {
       return res.toString();
     } else {
       const res = await commandToBeExecuted(clientId, ...reqDetails);
-      logger.debug(res.toString());
+      console.log("response details ->", res.toString());
       return res.toString();
     }
   } catch (err) {
