@@ -45,6 +45,12 @@ const AVAILABLE_COMMANDS = {
   EXEC: execCommand,
 };
 
+const COMMANDS_THAT_CAN_BE_QUEUED = {
+  SET: setCommand,
+  INCR: incrCommand,
+};
+
 module.exports = {
   AVAILABLE_COMMANDS,
+  COMMANDS_THAT_CAN_BE_QUEUED,
 };

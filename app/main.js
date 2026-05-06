@@ -1,8 +1,15 @@
 const net = require("net");
 const { randomUUID } = require("node:crypto");
-const { AVAILABLE_COMMANDS } = require("./lib/commands");
+const {
+  AVAILABLE_COMMANDS,
+  COMMANDS_THAT_CAN_BE_QUEUED,
+} = require("./lib/commands");
 const { logger } = require("./lib/contextualLogger");
-const { decodeResp, encodeToRespError, encodeToRespString } = require("./lib/respParser");
+const {
+  decodeResp,
+  encodeToRespError,
+  encodeToRespString,
+} = require("./lib/respParser");
 const { redisLookup } = require("./lib/inMemoryLookup");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -18,9 +25,9 @@ async function executeAvailableCommand(reqData) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
     const queuedCommands = redisLookup.multi;
-    if (queuedCommands) {
-      queuedCommands.push({commandToBeExecuted, reqDetails});
-      const res = encodeToRespString('QUEUED');
+    if (queuedCommands && COMMANDS_THAT_CAN_BE_QUEUED[reqType.toUpperCase()]) {
+      queuedCommands.push({ commandToBeExecuted, reqDetails });
+      const res = encodeToRespString("QUEUED");
       return res.toString();
     } else {
       const res = await commandToBeExecuted(...reqDetails);
