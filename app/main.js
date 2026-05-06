@@ -22,7 +22,7 @@ async function executeAvailableCommand(reqData) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
     const queuedCommands = redisLookup.multi;
-    if (queuedCommands) {
+    if (queuedCommands && reqType.toUpperCase !== "EXEC") {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");
       return res.toString();
