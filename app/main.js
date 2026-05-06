@@ -53,7 +53,7 @@ const server = net.createServer((connection) => {
     });
   });
 
-  connection.end("end", () => {
+  connection.on("end", () => {
     logger.info(`client with id - ${clientId} closed the connection`);
     clientLookup.delete(clientId);
   });
