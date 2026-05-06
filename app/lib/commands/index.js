@@ -48,8 +48,8 @@ const AVAILABLE_COMMANDS = {
 };
 
 const MULTI_EXCEPTION_COMMANDS = {
-  EXEC,
-  DISCARD,
+  EXEC: execCommand,
+  DISCARD: discardCommand,
 };
 
 module.exports = {
