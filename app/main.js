@@ -24,7 +24,7 @@ async function executeAvailableCommand(clientId, reqData) {
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
-    const { queuedCommands } = clientLookup.get(clientId);
+    const { queuedCommands } = clientLookup[clientId];
     if (queuedCommands && reqType.toUpperCase() !== "EXEC") {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");
@@ -46,7 +46,7 @@ async function executeAvailableCommand(clientId, reqData) {
 // Uncomment the code below to pass the first stage
 const server = net.createServer((connection) => {
   const clientId = ++clientCounter;
-  clientLookup.set(clientId, { connection });
+  clientLookup[clientId] = { connection };
   // Handle connection
   connection.on("data", (data) => {
     logger.initSubContext({ traceId: randomUUID(), clientId }, async () => {
@@ -57,7 +57,7 @@ const server = net.createServer((connection) => {
 
   connection.on("end", () => {
     logger.info(`client with id - ${clientId} closed the connection`);
-    clientLookup.delete(clientId);
+    delete clientLookup[clientId];
   });
 });
 

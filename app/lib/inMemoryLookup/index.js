@@ -1,6 +1,6 @@
 const redisLookup = {};
 
-const clientLookup = new Map();
+const clientLookup = {};
 
 module.exports = {
   redisLookup,

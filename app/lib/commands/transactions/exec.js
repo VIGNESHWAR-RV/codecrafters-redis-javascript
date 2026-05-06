@@ -2,7 +2,7 @@ const { clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespArray, encodeToRespError } = require("../../respParser");
 
 async function execCommand(clientId) {
-  const clientData = clientLookup.get(clientId);
+  const clientData = clientLookup[clientId];
   const { queuedCommands } = clientData;
 
   if (!queuedCommands) {
