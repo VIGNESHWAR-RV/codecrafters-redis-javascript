@@ -2,7 +2,8 @@ const net = require("net");
 const { randomUUID } = require("node:crypto");
 const { AVAILABLE_COMMANDS } = require("./lib/commands");
 const { logger } = require("./lib/contextualLogger");
-const { decodeResp, encodeToRespError } = require("./lib/respParser");
+const { decodeResp, encodeToRespError, encodeToRespString } = require("./lib/respParser");
+const { redisLookup } = require("./lib/inMemoryLookup");
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 logger.info("Logs from your program will appear here!");
@@ -16,8 +17,15 @@ async function executeAvailableCommand(reqData) {
     if (!commandToBeExecuted) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
-    const res = await commandToBeExecuted(...reqDetails);
-    return res.toString();
+    const queuedCommands = redisLookup.multi;
+    if (queuedCommands) {
+      queuedCommands.push({commandToBeExecuted, reqDetails});
+      const res = encodeToRespString('QUEUED');
+      return res.toString();
+    } else {
+      const res = await commandToBeExecuted(...reqDetails);
+      return res.toString();
+    }
   } catch (err) {
     logger.error(err.stack);
     const res = encodeToRespError(err);

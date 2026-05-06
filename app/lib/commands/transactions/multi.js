@@ -2,7 +2,7 @@ const { redisLookup } = require("../../inMemoryLookup");
 const { encodeToRespString } = require("../../respParser");
 
 function multiCommand() {
-  redisLookup["isMultiEnabled"] = true;
+  redisLookup.multi = [];
   return encodeToRespString("OK");
 }
 
