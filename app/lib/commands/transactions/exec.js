@@ -13,7 +13,7 @@ async function execCommand(clientId) {
   for (let i = 0; i < queuedCommands.length; i++) {
     const { commandToBeExecuted, reqDetails } = queuedCommands[i];
     try {
-      const res = await commandToBeExecuted(...reqDetails);
+      const res = await commandToBeExecuted(clientId, ...reqDetails);
       finalResponse.push(res);
     } catch (err) {
       logger.error(err.stack);
