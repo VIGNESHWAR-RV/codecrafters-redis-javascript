@@ -39,7 +39,7 @@ async function executeAvailableCommand(clientId, reqData) {
       return res.toString();
     }
   } catch (err) {
-    console.error(err.stack);
+    logger.error(err.stack);
     const res = encodeToRespError(err);
     return res.toString();
   } finally {
