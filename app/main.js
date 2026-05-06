@@ -1,9 +1,6 @@
 const net = require("net");
 const { randomUUID } = require("node:crypto");
-const {
-  AVAILABLE_COMMANDS,
-  COMMANDS_THAT_CAN_BE_QUEUED,
-} = require("./lib/commands");
+const { AVAILABLE_COMMANDS } = require("./lib/commands");
 const { logger } = require("./lib/contextualLogger");
 const {
   decodeResp,
@@ -25,7 +22,7 @@ async function executeAvailableCommand(reqData) {
       throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
     }
     const queuedCommands = redisLookup.multi;
-    if (queuedCommands && COMMANDS_THAT_CAN_BE_QUEUED[reqType.toUpperCase()]) {
+    if (queuedCommands) {
       queuedCommands.push({ commandToBeExecuted, reqDetails });
       const res = encodeToRespString("QUEUED");
       return res.toString();
