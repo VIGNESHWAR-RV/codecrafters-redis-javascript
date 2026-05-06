@@ -1,8 +1,11 @@
-const { encodeToRespNull, encodeToRespBulkString } = require("../../respParser");
+const {
+  encodeToRespNull,
+  encodeToRespBulkString,
+} = require("../../respParser");
 const { redisLookup } = require("../../inMemoryLookup");
 
 function getCommand(key) {
-  let { value, expiryTimeStamp } = redisLookup[key];
+  let { value = null, expiryTimeStamp } = redisLookup?.[key] ?? {};
   if (expiryTimeStamp && Date.now() >= expiryTimeStamp) {
     delete redisLookup[key];
     const res = encodeToRespNull();
