@@ -2,7 +2,8 @@ const { clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespArray, encodeToRespError } = require("../../respParser");
 
 async function execCommand(clientId) {
-  const { queuedCommands } = clientLookup[clientId];
+  const clientData = clientLookup.get(clientId);
+  const { queuedCommands } = clientData;
 
   if (!queuedCommands) {
     throw new Error("EXEC without MULTI");
@@ -21,7 +22,7 @@ async function execCommand(clientId) {
     }
   }
 
-  delete clientLookup.get(clientId).queuedCommands;
+  delete clientData.queuedCommands;
   return encodeToRespArray(finalResponse);
 }
 
