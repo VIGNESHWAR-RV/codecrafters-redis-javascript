@@ -11,3 +11,7 @@ function discardCommand(clientId) {
   delete clientData.queuedCommands;
   return encodeToRespString("OK");
 }
+
+module.exports = {
+  discardCommand,
+};

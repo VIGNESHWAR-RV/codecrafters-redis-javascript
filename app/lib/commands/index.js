@@ -21,6 +21,7 @@ const { xReadCommand } = require("./streams/xread");
 const { incrCommand } = require("./transactions/incr");
 const { multiCommand } = require("./transactions/multi");
 const { execCommand } = require("./transactions/exec");
+const { discardCommand } = require("./transactions/discard");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -43,6 +44,7 @@ const AVAILABLE_COMMANDS = {
   INCR: incrCommand,
   MULTI: multiCommand,
   EXEC: execCommand,
+  DISCARD: discardCommand,
 };
 
 module.exports = {
