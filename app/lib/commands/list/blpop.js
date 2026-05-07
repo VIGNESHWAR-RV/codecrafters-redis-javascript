@@ -8,12 +8,14 @@ const {
 
 const observersLookup = new Map();
 
-function notifyBlPopObservers(list) {
+function notifyBlPopObservers(listName) {
   setImmediate(() => {
-    if (list.length) {
+    const { list } = redisLookup?.[listName] ?? {};
+    if (list && list.length) {
       const callbacks = observersLookup.get(list);
       if (callbacks?.length) {
         const removedValue = list.shift();
+        redisLookup[listName].updatedAt = Date.now();
         const callback = callbacks.shift();
         callback(removedValue);
         if (!callbacks.length) {
@@ -69,6 +71,7 @@ async function blPopCommand(clientId, listName, timer = 0) {
       });
     } else {
       const removedValue = list.shift();
+      redisLookup[listName].updatedAt = Date.now();
       result = [listName, removedValue];
     }
 

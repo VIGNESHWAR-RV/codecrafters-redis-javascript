@@ -2,7 +2,11 @@ const { redisLookup, clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespString } = require("../../respParser");
 
 function multiCommand(clientId) {
-  clientLookup[clientId].queuedCommands = [];
+  const clientData = clientLookup[clientId];
+  if (clientData.queuedCommands) {
+    throw new Error("MULTI within MULTI");
+  }
+  clientData.queuedCommands = [];
   return encodeToRespString("OK");
 }
 

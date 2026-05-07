@@ -56,6 +56,7 @@ function xAddCommand(clientId, stream_key, entryId, ...args) {
     let entryObj = { id: [milliSecondId, sequenceId], args };
 
     entries.push(entryObj);
+    redisLookup[stream_key].updatedAt = Date.now();
 
     notifyXReadObservers(stream_key);
 

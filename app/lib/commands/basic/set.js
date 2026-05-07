@@ -2,7 +2,7 @@ const { encodeToRespString } = require("../../respParser");
 const { redisLookup } = require("../../inMemoryLookup");
 
 function setCommand(clientId, key, value, expiryType, expiryValue) {
-  const val = { value, type: "string" };
+  const val = { value, type: "string", updatedAt: Date.now() };
   if (expiryType) {
     if (expiryType.toUpperCase() === "EX") {
       expiryValue = +expiryValue * 1000;

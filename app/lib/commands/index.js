@@ -51,6 +51,7 @@ const AVAILABLE_COMMANDS = {
 };
 
 const MULTI_EXCEPTION_COMMANDS = {
+  MULTI: multiCommand,
   EXEC: execCommand,
   DISCARD: discardCommand,
   WATCH: watchCommand,

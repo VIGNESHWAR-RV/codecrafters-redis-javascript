@@ -10,7 +10,9 @@ function rPushCommand(clientId, listName, ...values) {
   }
 
   list.push(...values);
-  notifyBlPopObservers(list);
+
+  redisLookup[listName].updatedAt = Date.now();
+  notifyBlPopObservers(listName);
   const res = encodeToRespInteger(list.length);
   return res;
 }

@@ -11,7 +11,7 @@ function lPushCommand(clientId, listName, ...values) {
 
   if (values?.length) {
     values.forEach((val) => list.unshift(val));
-    notifyBlPopObservers(list);
+    notifyBlPopObservers(listName);
   }
 
   const res = encodeToRespInteger(list.length);

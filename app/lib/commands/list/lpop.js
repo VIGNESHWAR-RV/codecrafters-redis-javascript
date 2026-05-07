@@ -28,6 +28,8 @@ function lPopCommand(clientId, listName, elementsCount = 1) {
     return encodeToRespBulkString(null);
   }
 
+  redisLookup[listName].updatedAt = Date.now();
+
   if (removedValues.length === 1) {
     return removedValues[0];
   }
