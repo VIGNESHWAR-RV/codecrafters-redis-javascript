@@ -53,6 +53,7 @@ const AVAILABLE_COMMANDS = {
 const MULTI_EXCEPTION_COMMANDS = {
   EXEC: execCommand,
   DISCARD: discardCommand,
+  WATCH: watchCommand,
 };
 
 module.exports = {
