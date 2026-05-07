@@ -8,6 +8,10 @@ function discardCommand(clientId) {
     throw new Error("DISCARD without MULTI");
   }
 
+  if (clientData.watchedKeys) {
+    delete clientData.watchedKeys;
+  }
+
   delete clientData.queuedCommands;
   return encodeToRespString("OK");
 }
