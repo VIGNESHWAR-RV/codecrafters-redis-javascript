@@ -3,11 +3,11 @@ const { clientLookup } = require("../../inMemoryLookup");
 const { encodeToRespString } = require("../../respParser");
 
 function unWatchCommand(clientId) {
-  const { watchedkeys } = clientLookup[clientId];
+  const { watchedKeys } = clientLookup?.[clientId] ?? {};
 
-  if (watchedkeys) {
+  if (watchedKeys) {
     logger.info(`unwatching the watched keys for the client - ${clientId}`);
-    delete clientLookup[clientId].watchedkeys;
+    delete clientLookup[clientId].watchedKeys;
   }
 
   return encodeToRespString("OK");
