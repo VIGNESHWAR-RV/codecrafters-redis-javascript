@@ -22,6 +22,7 @@ const { incrCommand } = require("./transactions/incr");
 const { multiCommand } = require("./transactions/multi");
 const { execCommand } = require("./transactions/exec");
 const { discardCommand } = require("./transactions/discard");
+const { watchCommand } = require("./optimistic_lokcing/watch");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -45,6 +46,8 @@ const AVAILABLE_COMMANDS = {
   MULTI: multiCommand,
   EXEC: execCommand,
   DISCARD: discardCommand,
+
+  WATCH: watchCommand,
 };
 
 const MULTI_EXCEPTION_COMMANDS = {
