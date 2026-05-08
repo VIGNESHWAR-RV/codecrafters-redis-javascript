@@ -4,7 +4,7 @@ const { format } = require("node:util");
 // ANSI Escape Codes for Colors
 const COLORS = {
   INFO: "\x1b[32m", // Green
-  DEBUG: "\x1b[34m", // Blue
+  DEBUG: "\x1b[36m", // Cyan
   WARN: "\x1b[33m", // Yellow
   ERROR: "\x1b[31m", // Red
   RESET: "\x1b[0m",
