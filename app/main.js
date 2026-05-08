@@ -19,7 +19,7 @@ const [nodePath, fileDir, ...args] = process.argv;
 
 for (let i = 0; i < args.length; i++) {
   const argVal = args[i];
-  if (argVal === "--port" && isNumber(agrs[i + 1])) {
+  if (argVal === "--port" && isNumber(args[i + 1])) {
     port = +args[i + 1];
   }
 }
