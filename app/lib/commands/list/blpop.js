@@ -21,8 +21,8 @@ function notifyBlPopObservers(listName) {
         if (!callbacks.length) {
           observersLookup.delete(list);
         }
-        if (list.length) {
-          notifyObservers(list);
+        if (callbacks.length && list.length) {
+          notifyBlPopObservers(listName);
         }
       } else {
         observersLookup.delete(list);

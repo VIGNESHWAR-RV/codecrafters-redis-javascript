@@ -1,24 +1,32 @@
-const { AsyncLocalStorage } = require("node:async_hooks");
+const { AsyncLocalStorage } = require("node:async_context");
 const { format } = require("node:util");
+
+// ANSI Escape Codes for Colors
+const COLORS = {
+  INFO: "\x1b[32m", // Green
+  DEBUG: "\x1b[34m", // Blue
+  WARN: "\x1b[33m", // Yellow
+  ERROR: "\x1b[31m", // Red
+  RESET: "\x1b[0m",
+};
 
 class ContextualLogger {
   constructor() {
     this.als = new AsyncLocalStorage();
     this.buffer = [];
     this.isFlushing = false;
-    this.BATCH_SIZE = 20; // Only stringify 20 logs before yielding to the event loop
+    this.BATCH_SIZE = 20;
   }
 
   log(level, ...messages) {
     const store = this.als.getStore();
-
     const contextSnapshot = store ? { ...store } : {};
 
     this.buffer.push({
       level,
       time: new Date().toISOString(),
       context: contextSnapshot,
-      msg: messages,
+      args: messages,
     });
 
     if (!this.isFlushing) {
@@ -33,13 +41,23 @@ class ContextualLogger {
       return;
     }
 
-    // Processing only a small chunk of logs to prevent CPU blocking
     const chunks = this.buffer.splice(0, this.BATCH_SIZE);
-
     let output = "";
+
     for (let i = 0; i < chunks.length; i++) {
-      chunks[i].msg = format(chunks[i].msg);
-      output += JSON.stringify(chunks[i]) + "\n";
+      const item = chunks[i];
+      const color = COLORS[item.level] || COLORS.RESET;
+      const coloredLevel = `${color}${item.level}${COLORS.RESET}`;
+
+      const renderedMsg = format(...item.args);
+      const logEntry = {
+        time: item.time,
+        level: coloredLevel,
+        msg: renderedMsg,
+        context: item.context,
+      };
+
+      output += JSON.stringify(logEntry) + "\n";
     }
 
     process.stdout.write(output, () => {
