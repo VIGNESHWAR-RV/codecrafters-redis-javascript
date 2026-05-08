@@ -46,20 +46,15 @@ class ContextualLogger {
 
     for (let i = 0; i < chunks.length; i++) {
       const item = chunks[i];
-      const renderedMsg = format(...item.args);
       const colorCode = COLORS[item.level] || COLORS.RESET;
       const coloredLevel = `${colorCode}${item.level}${COLORS.RESET}`;
+      const renderedMsg = `${colorCode}${format(...item.args)}${COLORS.RESET}`;
 
-      const logEntry = {
-        time: item.time,
-        level: coloredLevel,
-        msg: renderedMsg,
-        context: item.context,
-      };
+      const logEntry = `[${item.time}] ${coloredLevel} context:${JSON.stringify(item.context)} ${renderedMsg}`;
 
       // Stringify and then UN-ESCAPE the ANSI codes so the terminal sees them
       // JSON.stringify turns \x1b into \\u001b. We turn it back.
-      output += JSON.stringify(logEntry).replace(/\\u001b/g, "\x1b") + "\n";
+      output += logEntry.replace(/\\u001b/g, "\x1b") + "\n";
     }
 
     process.stdout.write(output, () => {
