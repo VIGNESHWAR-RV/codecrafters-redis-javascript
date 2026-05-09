@@ -27,6 +27,9 @@ const { discardCommand } = require("./transactions/discard");
 const { watchCommand } = require("./optimistic_lokcing/watch");
 const { unWatchCommand } = require("./optimistic_lokcing/unwatch");
 
+// Replication
+const { infoCommand } = require("./replication/info");
+
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
   ECHO: echoCommand,
@@ -52,6 +55,8 @@ const AVAILABLE_COMMANDS = {
 
   WATCH: watchCommand,
   UNWATCH: unWatchCommand,
+
+  INFO: infoCommand,
 };
 
 const MULTI_EXCEPTION_COMMANDS = {
@@ -60,6 +65,7 @@ const MULTI_EXCEPTION_COMMANDS = {
   DISCARD: discardCommand,
   WATCH: watchCommand,
   UNWATCH: unWatchCommand,
+  INFO: infoCommand,
 };
 
 module.exports = {
