@@ -54,7 +54,7 @@ async function executeAvailableCommand(clientId, reqData) {
       return res.toString();
     } else {
       const res = await commandToBeExecuted(clientId, ...reqDetails);
-      logger.debug("response details ->", res.toString());
+      logger.debug("response details ->", JSON.stringify(res.toString()));
       return res.toString();
     }
   } catch (err) {
