@@ -29,6 +29,7 @@ const { unWatchCommand } = require("./optimistic_lokcing/unwatch");
 
 // Replication
 const { infoCommand } = require("./replication/info");
+const { replConfCommand } = require("./replication/replconf");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -57,6 +58,7 @@ const AVAILABLE_COMMANDS = {
   UNWATCH: unWatchCommand,
 
   INFO: infoCommand,
+  REPLCONF: replConfCommand,
 };
 
 const MULTI_EXCEPTION_COMMANDS = {
@@ -66,6 +68,7 @@ const MULTI_EXCEPTION_COMMANDS = {
   WATCH: watchCommand,
   UNWATCH: unWatchCommand,
   INFO: infoCommand,
+  REPLCONF: replConfCommand,
 };
 
 module.exports = {
