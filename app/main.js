@@ -97,7 +97,7 @@ if (serverDetails.isReplica) {
       logger.info("connected with master");
       logger.debug("sending PING command");
 
-      masterConnection.write(encodeToRespArray(encodeToRespString("PING")));
+      masterConnection.write(encodeToRespArray([encodeToRespString("PING")]));
     },
   );
 
