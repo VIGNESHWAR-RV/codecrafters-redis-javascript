@@ -24,7 +24,9 @@ logger.info("Logs from your program will appear here!");
 
 const [nodePath, fileDir, ...args] = process.argv;
 
-logger.debug("arguments receieved -> ", ...args);
+if (args.length) {
+  logger.debug("arguments receieved -> ", ...args);
+}
 
 for (let i = 0; i < args.length; i++) {
   const argVal = args[i];
@@ -91,15 +93,21 @@ server.listen(serverDetails.port, serverDetails.ip);
 if (serverDetails.isReplica) {
   async function sendCommand(connection, ...cmdArgs) {
     return new Promise((resolve, reject) => {
-      connection.once("data", (data) => {
-        const response = decodeResp(data);
-        connection.removeListener("error", reject);
-        resolve(response);
+      logger.initSubContext({ masterReqId: randomUUID() }, () => {
+        connection.once("data", (data) => {
+          const response = decodeResp(data);
+          connection.removeListener("error", reject);
+          logger.debug(`Recieved Response from master ->`, response);
+          resolve(response);
+        });
+
+        connection.once("error", reject);
+
+        logger.debug(`Sending request to master ->`, cmdArgs);
+        connection.write(
+          encodeToRespArray(cmdArgs.map(encodeToRespBulkString)),
+        );
       });
-
-      connection.once("error", reject);
-
-      connection.write(encodeToRespArray(cmdArgs.map(encodeToRespBulkString)));
     });
   }
 
@@ -108,33 +116,28 @@ if (serverDetails.isReplica) {
       port: serverDetails.masterInfo.port,
       host: serverDetails.masterInfo.host,
     },
-    async () => {
-      logger.info("connected with master ✅");
+    logger.initSubContext(
+      { replica_host: serverDetails.host, replica_port: serverDetails.port },
+      async () => {
+        logger.info("connected with master ✅");
 
-      logger.debug("sending PING cmd");
-      const pingResponse = await sendCommand(masterConnection, "PING");
-      logger.debug(`Response for PING cmd`, pingResponse);
+        const pingResponse = await sendCommand(masterConnection, "PING");
 
-      logger.debug(
-        `Sending 1st REPLCONF cmd with port -> ${serverDetails.port}`,
-      );
-      const repl1stResponse = await sendCommand(
-        masterConnection,
-        "REPLCONF",
-        "listening-port",
-        serverDetails.port,
-      );
-      logger.debug(`Response for 1st REPLCONF cmd`, repl1stResponse);
+        const repl1stResponse = await sendCommand(
+          masterConnection,
+          "REPLCONF",
+          "listening-port",
+          serverDetails.port,
+        );
 
-      logger.debug(`Sending 2nd REPLCONF cmd with capa psync2`);
-      const repl2ndResponse = await sendCommand(
-        masterConnection,
-        "REPLCONF",
-        "capa",
-        "psync2",
-      );
-      logger.debug(`Response for 2nd REPLCONF cmd`, repl2ndResponse);
-    },
+        const repl2ndResponse = await sendCommand(
+          masterConnection,
+          "REPLCONF",
+          "capa",
+          "psync2",
+        );
+      },
+    ),
   );
 
   masterConnection.on("end", () => {});
