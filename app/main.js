@@ -148,11 +148,10 @@ if (serverDetails.isReplica) {
           );
 
           const { replicationId, offset } = serverDetails.masterInfo;
-          const psyncResponse = await sendCommand(
-            masterConnection,
-            "PSYNC",
-            replicationId,
-            offset,
+          masterConnection.write(
+            encodeToRespArray(
+              ["PSYNC", replicationId, offset].map(encodeToRespBulkString),
+            ),
           );
         },
       );
