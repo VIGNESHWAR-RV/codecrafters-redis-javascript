@@ -10,7 +10,11 @@ const {
   encodeToRespError,
   encodeToRespString,
 } = require("./lib/respParser");
-const { redisLookup, clientLookup } = require("./lib/inMemoryLookup");
+const {
+  redisLookup,
+  clientLookup,
+  serverDetails,
+} = require("./lib/inMemoryLookup");
 const { isNumber } = require("./lib/utils/typeUtil");
 
 let port = 6379;
@@ -21,6 +25,9 @@ for (let i = 0; i < args.length; i++) {
   const argVal = args[i];
   if (argVal === "--port" && isNumber(args[i + 1])) {
     port = +args[i + 1];
+  }
+  if (argVal === "--replicaof") {
+    serverDetails.isReplica = true;
   }
 }
 

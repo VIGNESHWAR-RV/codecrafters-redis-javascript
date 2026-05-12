@@ -1,9 +1,10 @@
+const { serverDetails } = require("../../inMemoryLookup");
 const { encodeToRespBulkString } = require("../../respParser");
 
 function generateReplicationInfo() {
   return `
     # Replication
-    role:master
+    role:${serverDetails.isReplica ? "slave" : "master"}
     `;
 }
 
