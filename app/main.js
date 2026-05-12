@@ -116,28 +116,30 @@ if (serverDetails.isReplica) {
       port: serverDetails.masterInfo.port,
       host: serverDetails.masterInfo.host,
     },
-    logger.initSubContext(
-      { replica_host: serverDetails.host, replica_port: serverDetails.port },
-      async () => {
-        logger.info("connected with master ✅");
+    () => {
+      logger.initSubContext(
+        { replica_host: serverDetails.host, replica_port: serverDetails.port },
+        async () => {
+          logger.info("connected with master ✅");
 
-        const pingResponse = await sendCommand(masterConnection, "PING");
+          const pingResponse = await sendCommand(masterConnection, "PING");
 
-        const repl1stResponse = await sendCommand(
-          masterConnection,
-          "REPLCONF",
-          "listening-port",
-          serverDetails.port,
-        );
+          const repl1stResponse = await sendCommand(
+            masterConnection,
+            "REPLCONF",
+            "listening-port",
+            serverDetails.port,
+          );
 
-        const repl2ndResponse = await sendCommand(
-          masterConnection,
-          "REPLCONF",
-          "capa",
-          "psync2",
-        );
-      },
-    ),
+          const repl2ndResponse = await sendCommand(
+            masterConnection,
+            "REPLCONF",
+            "capa",
+            "psync2",
+          );
+        },
+      );
+    },
   );
 
   masterConnection.on("end", () => {});
