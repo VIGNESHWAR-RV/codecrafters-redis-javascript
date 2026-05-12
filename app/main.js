@@ -113,7 +113,7 @@ if (serverDetails.isReplica) {
 
       logger.debug("sending PING cmd");
       const pingResponse = await sendCommand(masterConnection, "PING");
-      logger.debug(`Response for PING cmd`, response);
+      logger.debug(`Response for PING cmd`, pingResponse);
 
       logger.debug(
         `Sending 1st REPLCONF cmd with port -> ${serverDetails.port}`,
