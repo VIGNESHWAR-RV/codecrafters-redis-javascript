@@ -10,6 +10,7 @@ const {
   encodeToRespError,
   encodeToRespString,
   encodeToRespArray,
+  encodeToRespBulkString,
 } = require("./lib/respParser");
 const {
   redisLookup,
@@ -97,7 +98,9 @@ if (serverDetails.isReplica) {
       logger.info("connected with master");
       logger.debug("sending PING command");
 
-      masterConnection.write(encodeToRespArray([encodeToRespString("PING")]));
+      masterConnection.write(
+        encodeToRespArray([encodeToRespBulkString("PING")]),
+      );
     },
   );
 
