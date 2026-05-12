@@ -88,9 +88,13 @@ const server = net.createServer((connection) => {
   });
 });
 
-server.listen(serverDetails.port, serverDetails.ip);
+server.listen(serverDetails.port, serverDetails.host);
 
 if (serverDetails.isReplica) {
+  logger.info(
+    `Connecting Replica with address - "${serverDetails.host}:${serverDetails.port}" to master with address - "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
+  );
+
   async function sendCommand(connection, ...cmdArgs) {
     return new Promise((resolve, reject) => {
       logger.initSubContext({ masterReqId: randomUUID() }, () => {
@@ -120,7 +124,7 @@ if (serverDetails.isReplica) {
       logger.initSubContext(
         { replica_host: serverDetails.host, replica_port: serverDetails.port },
         async () => {
-          logger.info("connected with master ✅");
+          logger.info("connected with master successfully");
 
           const pingResponse = await sendCommand(masterConnection, "PING");
 
@@ -142,5 +146,9 @@ if (serverDetails.isReplica) {
     },
   );
 
-  masterConnection.on("end", () => {});
+  masterConnection.on("end", () => {
+    logger.info(
+      `Replica with address - "${serverDetails.host}:${serverDetails.port}" is disconnected from master with address - "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
+    );
+  });
 }
