@@ -9,6 +9,7 @@ const {
   decodeResp,
   encodeToRespError,
   encodeToRespString,
+  encodeToRespArray,
 } = require("./lib/respParser");
 const {
   redisLookup,
@@ -17,24 +18,24 @@ const {
 } = require("./lib/inMemoryLookup");
 const { isNumber } = require("./lib/utils/typeUtil");
 
-let port = 6379;
+// You can use print statements as follows for debugging, they'll be visible when running tests.
+logger.info("Logs from your program will appear here!");
 
 const [nodePath, fileDir, ...args] = process.argv;
+
+logger.debug("arguments receieved -> ", ...args);
 
 for (let i = 0; i < args.length; i++) {
   const argVal = args[i];
   if (argVal === "--port" && isNumber(args[i + 1])) {
-    port = +args[i + 1];
+    serverDetails.port = +args[i + 1];
   }
   if (argVal === "--replicaof") {
     serverDetails.isReplica = true;
+    const [host, port] = args[i + 1].split(" ");
+    serverDetails.masterInfo = { host, port: +port };
   }
 }
-
-// You can use print statements as follows for debugging, they'll be visible when running tests.
-logger.info("Logs from your program will appear here!");
-
-let clientCounter = 0;
 
 async function executeAvailableCommand(clientId, reqData) {
   const startTime = Date.now();
@@ -68,7 +69,7 @@ async function executeAvailableCommand(clientId, reqData) {
 
 // Uncomment the code below to pass the first stage
 const server = net.createServer((connection) => {
-  const clientId = ++clientCounter;
+  const clientId = ++clientLookup.clientCounter;
   clientLookup[clientId] = { connection };
   // Handle connection
   connection.on("data", (data) => {
@@ -84,4 +85,26 @@ const server = net.createServer((connection) => {
   });
 });
 
-server.listen(port, "127.0.0.1");
+server.listen(serverDetails.port, serverDetails.ip);
+
+if (serverDetails.isReplica) {
+  const masterConnection = net.createConnection(
+    {
+      port: serverDetails.masterInfo.port,
+      host: serverDetails.masterInfo.host,
+    },
+    () => {
+      logger.info("connected with master");
+      logger.debug("sending PING command");
+
+      masterConnection.write(encodeToRespArray(encodeToRespString("PING")));
+    },
+  );
+
+  masterConnection.on("data", (data) => {
+    const response = decodeResp(data);
+    logger.debug(`response from master ->`, data);
+  });
+
+  masterConnection.on("end", () => {});
+}
