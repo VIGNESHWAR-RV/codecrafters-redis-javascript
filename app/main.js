@@ -89,25 +89,53 @@ const server = net.createServer((connection) => {
 server.listen(serverDetails.port, serverDetails.ip);
 
 if (serverDetails.isReplica) {
+  async function sendCommand(connection, ...cmdArgs) {
+    return new Promise((resolve, reject) => {
+      connection.once("data", (data) => {
+        const response = decodeResp(data);
+        connection.removeListener("error", reject);
+        resolve(response);
+      });
+
+      connection.once("error", reject);
+
+      connection.write(encodeToRespArray(cmdArgs.map(encodeToRespBulkString)));
+    });
+  }
+
   const masterConnection = net.createConnection(
     {
       port: serverDetails.masterInfo.port,
       host: serverDetails.masterInfo.host,
     },
-    () => {
-      logger.info("connected with master");
-      logger.debug("sending PING command");
+    async () => {
+      logger.info("connected with master ✅");
 
-      masterConnection.write(
-        encodeToRespArray([encodeToRespBulkString("PING")]),
+      logger.debug("sending PING cmd");
+      const pingResponse = await sendCommand(masterConnection, "PING");
+      logger.debug(`Response for PING cmd`, response);
+
+      logger.debug(
+        `Sending 1st REPLCONF cmd with port -> ${serverDetails.port}`,
       );
+      const repl1stResponse = await sendCommand(
+        masterConnection,
+        "REPLCONF",
+        "listening-port",
+        serverDetails.port,
+      );
+      logger.debug(`Response for 1st REPLCONF cmd`, repl1stResponse);
+
+      logger.debug(`Sending 2nd REPLCONF cmd with capa psync2`);
+      const repl2ndResponse = await sendCommand(
+        masterConnection,
+        "REPLCONF",
+        "capa",
+        "psync2",
+      );
+      logger.debug(`Response for 2nd REPLCONF cmd`, repl2ndResponse);
     },
   );
-
-  masterConnection.on("data", (data) => {
-    const response = decodeResp(data);
-    logger.debug(`response from master ->`, data);
-  });
 
   masterConnection.on("end", () => {});
 }
