@@ -1,13 +1,12 @@
 const { serverDetails } = require("../../inMemoryLookup");
 const { encodeToRespBulkString } = require("../../respParser");
-const { generateReplicationId } = require("../../utils/idUtil");
 
 function generateReplicationInfo() {
   return `
     # Replication
     role:${serverDetails.isReplica ? "slave" : "master"}
-    master_replid:${generateReplicationId()}
-    master_repl_offset:0
+    master_replid:${serverDetails.isReplica ? serverDetails.replicationId : serverDetails.masterInfo.replicationId}
+    master_repl_offset: ${serverDetails.isReplica ? serverDetails.offset : serverDetails.masterInfo.offset}
     `;
 }
 
