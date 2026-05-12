@@ -5,8 +5,8 @@ function generateReplicationInfo() {
   return `
     # Replication
     role:${serverDetails.isReplica ? "slave" : "master"}
-    master_replid:${serverDetails.isReplica ? serverDetails.replicationId : serverDetails.masterInfo.replicationId}
-    master_repl_offset: ${serverDetails.isReplica ? serverDetails.offset : serverDetails.masterInfo.offset}
+    master_replid:${serverDetails.isReplica ? serverDetails.masterInfo.replicationId : serverDetails.replicationId}
+    master_repl_offset: ${serverDetails.isReplica ? serverDetails?.masterInfo?.offset : serverDetails.offset}
     `;
 }
 
