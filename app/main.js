@@ -36,7 +36,12 @@ for (let i = 0; i < args.length; i++) {
   if (argVal === "--replicaof") {
     serverDetails.isReplica = true;
     const [host, port] = args[i + 1].split(" ");
-    serverDetails.masterInfo = { host, port: +port };
+    serverDetails.masterInfo = {
+      host,
+      port: +port,
+      replicationId: "?",
+      offset: -1,
+    };
   }
 }
 
@@ -97,7 +102,7 @@ if (serverDetails.isReplica) {
 
   async function sendCommand(connection, ...cmdArgs) {
     return new Promise((resolve, reject) => {
-      logger.initSubContext({ masterReqId: randomUUID() }, () => {
+      logger.initSubContext({ replicaReqId: randomUUID() }, () => {
         connection.once("data", (data) => {
           const response = decodeResp(data);
           connection.removeListener("error", reject);
@@ -140,6 +145,14 @@ if (serverDetails.isReplica) {
             "REPLCONF",
             "capa",
             "psync2",
+          );
+
+          const { replicationId, offset } = serverDetails.masterInfo;
+          const psyncResponse = await sendCommand(
+            masterConnection,
+            "PSYNC",
+            replicationId,
+            offset,
           );
         },
       );
