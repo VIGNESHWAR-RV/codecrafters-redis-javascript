@@ -5,14 +5,16 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
   const { replicationId, offset } = serverDetails;
   const { connection } = clientLookup[clientId];
 
-  connection.write(
-    encodeToRespString(`FULLRESYNC ${replicationId} ${offset}`).toString(),
-  );
-  const emptyRDBBase64 =
-    "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
-  const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
-  connection.write(`$${emptyRDBBuffer.length}\r\n`);
-  connection.write(emptyRDBBuffer);
+  if (replicationIdVal === "?" && +offsetVal === -1) {
+    connection.write(
+      encodeToRespString(`FULLRESYNC ${replicationId} ${offset}`).toString(),
+    );
+    const emptyRDBBase64 =
+      "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+    const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
+    connection.write(`$${emptyRDBBuffer.length}\r\n`);
+    connection.write(emptyRDBBuffer);
+  }
 }
 
 module.exports = {
