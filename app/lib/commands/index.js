@@ -1,3 +1,11 @@
+const { logger } = require("../contextualLogger");
+const {
+  decodeResp,
+  encodeToRespString,
+  encodeToRespError,
+} = require("../respParser");
+const { clientLookup } = require("../inMemoryLookup");
+
 const { getCommand } = require("./basic/get");
 const { setCommand } = require("./basic/set");
 const { echoCommand } = require("./basic/echo");
@@ -74,7 +82,43 @@ const MULTI_EXCEPTION_COMMANDS = {
   PSYNC: pSyncCommand,
 };
 
+async function executeAvailableCommand(clientId, reqData) {
+  const startTime = Date.now();
+  try {
+    const [reqType, ...reqDetails] = decodeResp(reqData);
+    logger.info(reqType);
+    logger.debug(`request details ->`, reqDetails);
+    const commandToBeExecuted = AVAILABLE_COMMANDS[reqType.toUpperCase()];
+    if (!commandToBeExecuted) {
+      throw new Error(`${reqType} - COMMAND NOT FOUND !!!`);
+    }
+    const { queuedCommands } = clientLookup[clientId];
+    if (queuedCommands && !MULTI_EXCEPTION_COMMANDS[reqType.toUpperCase()]) {
+      queuedCommands.push({ commandToBeExecuted, reqDetails });
+      const stringifiedResponse = encodeToRespString("QUEUED").toString();
+      logger.debug("response details ->", stringifiedResponse);
+      return stringifiedResponse;
+    } else {
+      const res = await commandToBeExecuted(clientId, ...reqDetails);
+
+      if (res) {
+        const stringifiedResponse = res.toString();
+        logger.debug(
+          "response details ->",
+          JSON.stringify(stringifiedResponse),
+        );
+        return stringifiedResponse;
+      }
+    }
+  } catch (err) {
+    logger.error(err.stack);
+    const res = encodeToRespError(err);
+    return res.toString();
+  } finally {
+    logger.info(`Time Taken for execution - ${Date.now() - startTime}`);
+  }
+}
+
 module.exports = {
-  AVAILABLE_COMMANDS,
-  MULTI_EXCEPTION_COMMANDS,
+  executeAvailableCommand,
 };
