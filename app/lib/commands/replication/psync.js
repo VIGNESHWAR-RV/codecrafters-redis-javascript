@@ -11,7 +11,8 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
   const emptyRDBBase64 =
     "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
   const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
-  connection.write(`$${emptyRDBBuffer.length}\r\n${emptyRDBBuffer}`);
+  connection.write(`$${emptyRDBBuffer.length}\r\n`);
+  connection.write(emptyRDBBuffer);
 }
 
 module.exports = {
