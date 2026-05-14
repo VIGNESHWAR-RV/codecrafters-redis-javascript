@@ -5,7 +5,9 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
   const { replicationId, offset } = serverDetails;
   const { connection } = clientLookup[clientId];
 
-  connection.write(encodeToRespString(`FULLRESYNC ${replicationId} ${offset}`));
+  connection.write(
+    encodeToRespString(`FULLRESYNC ${replicationId} ${offset}`).toString(),
+  );
   const emptyRDBBase64 =
     "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
   const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
