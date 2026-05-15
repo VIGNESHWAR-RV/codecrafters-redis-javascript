@@ -32,7 +32,7 @@ function notifyUpdatesToReplica(...cmdArgs) {
       (clientId) => clientLookup[clientId],
     );
 
-    if (activeReplicas.length) {
+    if (!activeReplicas.length) {
       logger.debug("No Active replicas to sync update");
       return;
     }
