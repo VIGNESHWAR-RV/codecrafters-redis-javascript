@@ -16,6 +16,8 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
     connection.write(`$${emptyRDBBuffer.length}\r\n`);
     connection.write(emptyRDBBuffer);
 
+    logger.debug(`Sent Empty RDB file to replica`);
+
     clientLookup[clientId].isReadyForUpdates = true;
   }
 }
