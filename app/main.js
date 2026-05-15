@@ -2,7 +2,11 @@ const net = require("net");
 const { logger } = require("./lib/contextualLogger");
 const { generateContextID } = require("./lib/utils/idUtil");
 const { executeAvailableCommand } = require("./lib/commands");
-const { clientLookup, serverDetails } = require("./lib/inMemoryLookup");
+const {
+  clientLookup,
+  serverDetails,
+  activeReplicaClientIds,
+} = require("./lib/inMemoryLookup");
 const { isNumber } = require("./lib/utils/typeUtil");
 const { inititateReplicaToMasterConnection } = require("./lib/replica");
 
@@ -52,6 +56,9 @@ const server = net.createServer((connection) => {
   connection.on("end", () => {
     logger.info(`client with id - ${clientId} closed the connection`);
     delete clientLookup[clientId];
+    if (activeReplicaClientIds[clientId]) {
+      delete activeReplicaClientIds[clientId];
+    }
   });
 });
 

@@ -2,6 +2,7 @@ const { generateReplicationId } = require("../utils/idUtil");
 
 const redisLookup = {};
 const clientLookup = { clientCounter: 0 };
+const activeReplicaClientIds = {};
 const serverDetails = {
   port: 6379,
   host: "127.0.0.1",
@@ -12,5 +13,6 @@ const serverDetails = {
 module.exports = {
   redisLookup,
   clientLookup,
+  activeReplicaClientIds,
   serverDetails,
 };

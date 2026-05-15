@@ -1,5 +1,9 @@
 const { logger } = require("../../contextualLogger");
-const { serverDetails, clientLookup } = require("../../inMemoryLookup");
+const {
+  serverDetails,
+  clientLookup,
+  activeReplicaClientIds,
+} = require("../../inMemoryLookup");
 const { encodeToRespString, encodeToRespArray } = require("../../respParser");
 
 function pSyncCommand(clientId, replicationIdVal, offsetVal) {
@@ -18,17 +22,14 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
 
     logger.debug(`Sent Empty RDB file to replica`);
 
-    clientLookup[clientId].isReadyForUpdates = true;
-
-    const { isReplica, isReadyForUpdates } = clientLookup[clientId];
-    logger.debug({ isReplica, isReadyForUpdates });
+    activeReplicaClientIds[clientId] = true;
   }
 }
 
 function notifyUpdatesToReplica(...cmdArgs) {
   setImmediate(() => {
-    const activeReplicas = Object.values(clientLookup).filter(
-      ({ isReplica, isReadyForUpdates }) => isReplica && isReadyForUpdates,
+    const activeReplicas = Object.keys(activeReplicaClientIds).filter(
+      (clientId) => clientLookup[clientId],
     );
 
     if (activeReplicas.length) {
@@ -39,9 +40,10 @@ function notifyUpdatesToReplica(...cmdArgs) {
     logger.debug(
       `Sending update sync to total active replica - ${activeReplicas.length}`,
     );
-    activeReplicas.forEach(({ connection }) =>
-      connection.write(encodeToRespArray(cmdArgs).toString()),
-    );
+    activeReplicas.forEach((clientId) => {
+      const { connection } = clientLookup[clientId];
+      connection.write(encodeToRespArray(cmdArgs).toString());
+    });
   });
 }
 
