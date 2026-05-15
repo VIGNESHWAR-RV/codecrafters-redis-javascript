@@ -63,7 +63,7 @@ function inititateReplicaToMasterConnection() {
       // adding master also to client list
       // problem⚠️ ( as we want to use the commands folder for replica as well, we need clientId )
       const clientId = ++clientLookup.clientCounter;
-      clientLookup[clientId] = { connection, isMaster: true };
+      clientLookup[clientId] = { connection: masterConnection, isMaster: true };
 
       logger.initSubContext(
         {
