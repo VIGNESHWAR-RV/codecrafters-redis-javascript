@@ -1,7 +1,7 @@
 const { AsyncLocalStorage } = require("node:async_hooks");
 const { formatWithOptions } = require("node:util");
 
-const isTTY = process.stdout.isTTY;
+const isTTY = true; // process.stdout.isTTY;
 
 const COLORS = {
   INFO: "\x1b[32m",
