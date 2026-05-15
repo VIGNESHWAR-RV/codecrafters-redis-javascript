@@ -19,6 +19,9 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
     logger.debug(`Sent Empty RDB file to replica`);
 
     clientLookup[clientId].isReadyForUpdates = true;
+
+    const { isReplica, isReadyForUpdates } = clientLookup[clientId];
+    logger.debug({ isReplica, isReadyForUpdates });
   }
 }
 
