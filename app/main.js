@@ -42,7 +42,9 @@ const server = net.createServer((connection) => {
       { traceId: generateContextID(), clientId },
       async () => {
         const res = await executeAvailableCommand(clientId, data);
-        connection.write(res);
+        if (res) {
+          connection.write(res);
+        }
       },
     );
   });
