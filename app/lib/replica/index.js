@@ -7,6 +7,7 @@ const {
   encodeToRespBulkString,
 } = require("../respParser");
 const { clientLookup, serverDetails } = require("../inMemoryLookup");
+const { executeAvailableCommand } = require("../commands");
 
 async function sendCommandAndGetResponse(connection, ...cmdArgs) {
   return new Promise((resolve, reject) => {
@@ -21,21 +22,36 @@ async function sendCommandAndGetResponse(connection, ...cmdArgs) {
       connection.once("error", reject);
 
       logger.debug(`Sending request to master ->`, cmdArgs);
-      connection.write(encodeToRespArray(cmdArgs.map(encodeToRespBulkString)));
+      connection.write(
+        encodeToRespArray(cmdArgs.map(encodeToRespBulkString)).toString(),
+      );
     });
   });
 }
 
-function sendCommand(connection, ...cmdArgs) {
-  logger.initSubContext({ replicaReqId: generateContextID() }, () => {
-    logger.debug(`Sending request to master ->`, cmdArgs);
-    connection.write(encodeToRespArray(cmdArgs.map(encodeToRespBulkString)));
+async function handleFullReSync(connection) {
+  return new Promise((resolve, reject) => {
+    logger.initSubContext({ replicaReqId: generateContextID() }, () => {
+      connection.once("data", (data) => {
+        connection.removeListener("error", reject);
+        resolve();
+        logger.debug(`Raw response received from PSYNC -> `, data);
+      });
+
+      connection.once("error", reject);
+
+      const cmmArgs = ["PSYNC", "?", "-1"];
+      logger.debug(`Sending request to master ->`, cmdArgs);
+      connection.write(
+        encodeToRespArray(cmdArgs.map(encodeToRespBulkString)).toString(),
+      );
+    });
   });
 }
 
 function inititateReplicaToMasterConnection() {
   logger.info(
-    `Connecting Replica with address - "${serverDetails.host}:${serverDetails.port}" to master with address - "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
+    `Connecting Replica "${serverDetails.host}:${serverDetails.port}" to master "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
   );
 
   const masterConnection = net.createConnection(
@@ -44,8 +60,18 @@ function inititateReplicaToMasterConnection() {
       host: serverDetails.masterInfo.host,
     },
     () => {
+      // adding master also to client list
+      // problem⚠️ ( as we want to use the commands folder for replica as well, we need clientId )
+      const clientId = ++clientLookup.clientCounter;
+      clientLookup[clientId] = { connection, isMaster: true };
+
       logger.initSubContext(
-        { replica_host: serverDetails.host, replica_port: serverDetails.port },
+        {
+          isReplica: true,
+          replica_host: serverDetails.host,
+          replica_port: serverDetails.port,
+          masterClientId: clientId,
+        },
         async () => {
           logger.info("connected with master successfully");
 
@@ -68,18 +94,27 @@ function inititateReplicaToMasterConnection() {
             "psync2",
           );
 
-          const { replicationId, offset } = serverDetails.masterInfo;
-          sendCommand(masterConnection, "PSYNC", replicationId, offset);
+          await handleFullReSync(masterConnection);
+
+          masterConnection.on("data", (data) => {
+            logger.initSubContext(
+              { cmdSyncReqId: generateContextID() },
+              async () => {
+                await executeAvailableCommand(data);
+              },
+            );
+          });
+
+          masterConnection.on("end", () => {
+            logger.info(
+              `Replica is disconnected from master - "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
+            );
+            delete clientLookup[clientId];
+          });
         },
       );
     },
   );
-
-  masterConnection.on("end", () => {
-    logger.info(
-      `Replica with address - "${serverDetails.host}:${serverDetails.port}" is disconnected from master with address - "${serverDetails.masterInfo.host}:${serverDetails.masterInfo.port}"`,
-    );
-  });
 }
 
 module.exports = {
