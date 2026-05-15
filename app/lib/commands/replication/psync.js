@@ -4,7 +4,11 @@ const {
   clientLookup,
   activeReplicaClientIds,
 } = require("../../inMemoryLookup");
-const { encodeToRespString, encodeToRespArray } = require("../../respParser");
+const {
+  encodeToRespString,
+  encodeToRespArray,
+  encodeToRespBulkString,
+} = require("../../respParser");
 
 function pSyncCommand(clientId, replicationIdVal, offsetVal) {
   const { replicationId, offset } = serverDetails;
@@ -42,7 +46,9 @@ function notifyUpdatesToReplica(...cmdArgs) {
     );
     activeReplicas.forEach((clientId) => {
       const { connection } = clientLookup[clientId];
-      connection.write(encodeToRespArray(cmdArgs).toString());
+      connection.write(
+        encodeToRespArray(cmdArgs.map(encodeToRespBulkString)).toString(),
+      );
     });
   });
 }
