@@ -1,12 +1,13 @@
 const { AsyncLocalStorage } = require("node:async_hooks");
-const { format } = require("node:util");
+const { formatWithOptions } = require("node:util");
 
-// ANSI Escape Codes for Colors
+const isTTY = process.stdout.isTTY;
+
 const COLORS = {
-  INFO: "\x1b[32m", // Green
-  DEBUG: "\x1b[36m", // Cyan
-  WARN: "\x1b[33m", // Yellow
-  ERROR: "\x1b[31m", // Red
+  INFO: "\x1b[32m",
+  DEBUG: "\x1b[36m",
+  WARN: "\x1b[33m",
+  ERROR: "\x1b[31m",
   RESET: "\x1b[0m",
 };
 
@@ -15,17 +16,16 @@ class ContextualLogger {
     this.als = new AsyncLocalStorage();
     this.buffer = [];
     this.isFlushing = false;
-    this.BATCH_SIZE = 20;
+    this.BATCH_SIZE = 100;
   }
 
   log(level, ...messages) {
-    const store = this.als.getStore();
-    const contextSnapshot = store ? { ...store } : {};
+    const context = this.als.getStore() || null;
 
     this.buffer.push({
       level,
       time: new Date().toISOString(),
-      context: contextSnapshot,
+      context,
       args: messages,
     });
 
@@ -41,20 +41,37 @@ class ContextualLogger {
       return;
     }
 
-    const chunks = this.buffer.splice(0, this.BATCH_SIZE);
+    // High performance: Take a slice and reset the main buffer immediately
+    // This stops the O(N) array modification tax
+    const chunks = this.buffer;
+    this.buffer = [];
+
     let output = "";
+    const total = chunks.length;
 
     for (let i = 0; i < chunks.length; i++) {
       const item = chunks[i];
-      const colorCode = COLORS[item.level] || COLORS.RESET;
-      const coloredLevel = `${colorCode}${item.level}${COLORS.RESET}`;
-      const renderedMsg = `${colorCode}${format(...item.args)}${COLORS.RESET}`;
 
-      const logEntry = `[${item.time}] ${coloredLevel} context:${JSON.stringify(item.context)} ${renderedMsg}`;
+      // Clean serialization wrapper handling Errors natively
+      const formattedMsg = formatWithOptions({ colors: isTTY }, ...item.args);
 
-      // Stringify and then UN-ESCAPE the ANSI codes so the terminal sees them
-      // JSON.stringify turns \x1b into \\u001b. We turn it back.
-      output += logEntry.replace(/\\u001b/g, "\x1b") + "\n";
+      if (isTTY) {
+        // Human-readable terminal output format
+        const color = COLORS[item.level] || "";
+        const ctxStr = item.context
+          ? ` ctx:${JSON.stringify(item.context)}`
+          : "";
+        output += `[${item.time}] ${color}${item.level}${COLORS.RESET} ${ctxStr} ${formattedMsg}\n`;
+      } else {
+        // Pure JSON machine-readable output for production
+        output +=
+          JSON.stringify({
+            time: item.time,
+            level: item.level,
+            context: item.context,
+            message: formattedMsg,
+          }) + "\n";
+      }
     }
 
     process.stdout.write(output, () => {

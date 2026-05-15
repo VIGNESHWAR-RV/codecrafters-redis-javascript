@@ -1,5 +1,6 @@
+const { logger } = require("../../contextualLogger");
 const { serverDetails, clientLookup } = require("../../inMemoryLookup");
-const { encodeToRespString } = require("../../respParser");
+const { encodeToRespString, encodeToRespArray } = require("../../respParser");
 
 function pSyncCommand(clientId, replicationIdVal, offsetVal) {
   const { replicationId, offset } = serverDetails;
@@ -14,9 +15,32 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
     const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
     connection.write(`$${emptyRDBBuffer.length}\r\n`);
     connection.write(emptyRDBBuffer);
+
+    clientLookup[clientId].isReadyForUpdates = true;
   }
+}
+
+function notifyUpdatesToReplica(...cmdArgs) {
+  setImmediate(() => {
+    const activeReplicas = Object.values(clientLookup).filter(
+      ({ isReplica, isReadyForUpdates }) => isReplica && isReadyForUpdates,
+    );
+
+    if (activeReplicas.length) {
+      logger.debug("No Active replicas to sync update");
+      return;
+    }
+
+    logger.debug(
+      `Sending update sync to total active replica - ${activeReplicas.length}`,
+    );
+    activeReplicas.forEach(({ connection }) =>
+      connection.write(encodeToRespArray(cmdArgs).toString()),
+    );
+  });
 }
 
 module.exports = {
   pSyncCommand,
+  notifyUpdatesToReplica,
 };

@@ -38,7 +38,7 @@ const { unWatchCommand } = require("./optimistic_lokcing/unwatch");
 // Replication
 const { infoCommand } = require("./replication/info");
 const { replConfCommand } = require("./replication/replconf");
-const { pSyncCommand } = require("./replication/psync");
+const { pSyncCommand, notifyUpdatesToReplica } = require("./replication/psync");
 
 const AVAILABLE_COMMANDS = {
   PING: pingCommand,
@@ -82,6 +82,10 @@ const MULTI_EXCEPTION_COMMANDS = {
   PSYNC: pSyncCommand,
 };
 
+const COMMANDS_TO_BE_NOTIFIED_TO_REPLICA = {
+  SET: setCommand,
+};
+
 async function executeAvailableCommand(clientId, reqData) {
   const startTime = Date.now();
   try {
@@ -100,6 +104,10 @@ async function executeAvailableCommand(clientId, reqData) {
       return stringifiedResponse;
     } else {
       const res = await commandToBeExecuted(clientId, ...reqDetails);
+
+      if (COMMANDS_TO_BE_NOTIFIED_TO_REPLICA[reqType.toUpperCase()]) {
+        notifyUpdatesToReplica(reqType, ...reqDetails);
+      }
 
       if (res) {
         const stringifiedResponse = res.toString();
