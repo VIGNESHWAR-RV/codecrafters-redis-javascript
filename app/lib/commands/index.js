@@ -89,6 +89,7 @@ const COMMANDS_TO_BE_NOTIFIED_TO_REPLICA = {
 async function executeAvailableCommand(clientId, reqData) {
   const startTime = Date.now();
   try {
+    logger.debug(`raw request ->`, reqData);
     const [reqType, ...reqDetails] = decodeResp(reqData);
     logger.info(reqType);
     logger.debug(`request details ->`, reqDetails);
