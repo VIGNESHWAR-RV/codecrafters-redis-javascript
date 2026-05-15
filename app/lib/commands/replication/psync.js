@@ -23,14 +23,11 @@ function pSyncCommand(clientId, replicationIdVal, offsetVal) {
     const emptyRDBBuffer = Buffer.from(emptyRDBBase64, "base64");
     connection.write(`$${emptyRDBBuffer.length}\r\n`);
     connection.write(emptyRDBBuffer);
-
-    logger.debug(`Sent Empty RDB file to replica`);
-
     activeReplicaClientIds[clientId] = true;
   }
 }
 
-function notifyUpdatesToReplica(...cmdArgs) {
+function notifyUpdatesToReplica(rawCmdRequest) {
   setImmediate(() => {
     const activeReplicas = Object.keys(activeReplicaClientIds).filter(
       (clientId) => clientLookup[clientId],
@@ -46,9 +43,7 @@ function notifyUpdatesToReplica(...cmdArgs) {
     );
     activeReplicas.forEach((clientId) => {
       const { connection } = clientLookup[clientId];
-      connection.write(
-        encodeToRespArray(cmdArgs.map(encodeToRespBulkString)).toString(),
-      );
+      connection.write(rawCmdRequest.toString());
     });
   });
 }

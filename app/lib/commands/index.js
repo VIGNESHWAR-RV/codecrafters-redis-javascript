@@ -89,7 +89,6 @@ const COMMANDS_TO_BE_NOTIFIED_TO_REPLICA = {
 async function executeAvailableCommand(clientId, reqData) {
   const startTime = Date.now();
   try {
-    logger.debug(`raw request ->`, reqData.toString());
     const [reqType, ...reqDetails] = decodeResp(reqData);
     logger.info(reqType);
     logger.debug(`request details ->`, reqDetails);
@@ -107,7 +106,7 @@ async function executeAvailableCommand(clientId, reqData) {
       const res = await commandToBeExecuted(clientId, ...reqDetails);
 
       if (COMMANDS_TO_BE_NOTIFIED_TO_REPLICA[reqType.toUpperCase()]) {
-        notifyUpdatesToReplica(reqType, ...reqDetails);
+        notifyUpdatesToReplica(reqData);
       }
 
       if (res) {
