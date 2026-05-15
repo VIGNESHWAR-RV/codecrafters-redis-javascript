@@ -40,7 +40,7 @@ async function handleFullReSync(connection) {
 
       connection.once("error", reject);
 
-      const cmmArgs = ["PSYNC", "?", "-1"];
+      const cmdArgs = ["PSYNC", "?", "-1"];
       logger.debug(`Sending request to master ->`, cmdArgs);
       connection.write(
         encodeToRespArray(cmdArgs.map(encodeToRespBulkString)).toString(),
