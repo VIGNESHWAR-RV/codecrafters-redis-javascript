@@ -35,7 +35,7 @@ async function handleFullReSync(connection) {
       connection.once("data", (data) => {
         connection.removeListener("error", reject);
         resolve();
-        logger.debug(`Raw response received from PSYNC -> `, data);
+        logger.debug(`Raw response received from PSYNC -> `, data.toString());
       });
 
       connection.once("error", reject);
@@ -100,6 +100,7 @@ function inititateReplicaToMasterConnection() {
             logger.initSubContext(
               { cmdSyncReqId: generateContextID() },
               async () => {
+                logger.debug(`Incoming Sync Request -> `, data.toString());
                 await executeAvailableCommand(data);
               },
             );
